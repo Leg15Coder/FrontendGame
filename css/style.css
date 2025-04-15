@@ -87,12 +87,10 @@ textarea {
 /* css/style.css */
 
 body {
-  font-family: sans-serif;
-  background: #111;
-  color: #fff;
-  text-align: center;
+  font-family: 'Segoe UI', sans-serif;
   margin: 0;
-  padding: 1em;
+  background-color: #121212;
+  color: #f0f0f0;
 }
 
 #info {
@@ -146,23 +144,70 @@ body {
 }
 
 header {
-  background: #222;
-  padding: 1em;
-  margin-bottom: 1em;
+  background-color: #1e1e1e;
+  padding: 1rem;
+  text-align: center;
+  font-size: 1.8rem;
+  font-weight: bold;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+}
+
+nav {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  background-color: #222;
+  padding: 1rem 0;
+  animation: fadeIn 1s ease-out;
 }
 
 nav button {
-  margin: 0 5px;
-  padding: 0.5em 1em;
-  background: #444;
-  color: white;
+  background: #333;
+  color: #fff;
   border: none;
-  border-radius: 6px;
+  padding: 0.75rem 1.25rem;
+  border-radius: 10px;
+  font-size: 1rem;
   cursor: pointer;
+  transition: all 0.3s ease;
 }
 
 nav button:hover {
-  background: #666;
+  background-color: #4CAF50;
+  transform: scale(1.1);
+  box-shadow: 0 0 15px #4CAF50;
+}
+
+main {
+  padding: 2rem;
+  min-height: 60vh;
+  animation: slideUp 0.7s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.section {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: all 0.5s ease;
+}
+
+.section.active {
+  display: block;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.hidden {
+  display: none !important;
 }
 
 /* ==========================================================================

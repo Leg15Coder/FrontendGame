@@ -1,5 +1,5 @@
 <!doctype html>
-<html class="no-js" lang="ru">
+<html lang="ru">
 
 <head>
   <meta charset="utf-8">
@@ -23,32 +23,28 @@
 </head>
 
 <body>
-  <header>
-    <h1>🎮 Game Walk</h1>
-    <nav>
-      <button onclick="navigate('about')">Об игре</button>
-      <button onclick="navigate('game')">Играть</button>
-      <button onclick="navigate('records')">Рекорды</button>
-    </nav>
-  </header>
+  <header>🔥 Ходилка — Приключение начинается!</header>
+
+  <nav>
+    <button id="btn-about">Об игре</button>
+    <button id="btn-play">Играть</button>
+    <button id="btn-stats">Результаты</button>
+  </nav>
 
   <main>
-    <section id="aboutSection">
-      <h2>Правила игры</h2>
-      <p>
-        Вы играете за героя, которому нужно пройти до выхода.
-        На пути встречаются ловушки (огонь, враги), которые отнимают очки.
-        Если очки опустятся слишком низко, игра закончится.
-        После прохождения уровня вы переходите на следующий, сложность растёт!
-      </p>
+    <section id="section-about" class="section active">
+      <h2>Как играть</h2>
+      <p>Передвигайся по карте, избегай врагов и ловушек, найди выход. С каждым уровнем всё сложнее!</p>
     </section>
 
-    <section id="gameSection" style="display: none;">
+    <section id="section-play" class="section hidden">
+      <h2>Игра</h2>
       <div id="info">Level: 1 | Score: 0</div>
       <div id="game"></div>
     </section>
 
-    <section id="recordsSection" style="display: none;">
+    <section id="section-stats" class="section hidden">
+      <h2>Статистика</h2>
       <div id="records"></div>
     </section>
   </main>

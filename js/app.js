@@ -1,8 +1,11 @@
 import { generateMap } from './generator.js';
 import { renderGame } from './game-interface.js';
 
+const API_URL = "https://leg15coder-frontendgam-30.deno.dev";
+
 let level = 1;
 let score = 0;
+let health = 20;
 let player = { x: 1, y: 1 };
 let map = [];
 
@@ -53,7 +56,7 @@ async function gameOver() {
   if (name) {
     const record = { name, score, level, time: new Date().toISOString() };
 
-    await fetch('/api/record', {
+    await fetch(`${API_URL}/api/record`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(record)
@@ -64,8 +67,6 @@ async function gameOver() {
   level = 1;
   startLevel();
 }
-
-
 
 window.addEventListener('keydown', (e) => {
   switch (e.key) {
@@ -79,7 +80,7 @@ window.addEventListener('keydown', (e) => {
 startLevel();
 
 window.showRecords = async function () {
-  const res = await fetch('/api/records');
+  const res = await fetch(`${API_URL}/api/record`);
   const records = await res.json();
 
   const table = `
@@ -103,15 +104,43 @@ window.showRecords = async function () {
 };
 
 window.navigate = function (section) {
-  document.getElementById('aboutSection').style.display = 'none';
-  document.getElementById('gameSection').style.display = 'none';
-  document.getElementById('recordsSection').style.display = 'none';
+  const sections = ['about', 'play', 'stats'];
+  sections.forEach(name => {
+    document.getElementById(`section-${name}`).classList.add('hidden');
+    document.getElementById(`section-${name}`).classList.remove('active');
+  });
 
-  if (section === 'records') {
+  if (section === 'stats') {
     showRecords();
   }
 
-  const id = section + 'Section';
-  document.getElementById(id).style.display = 'block';
+  const current = document.getElementById(`section-${section}`);
+  current.classList.remove('hidden');
+  current.classList.add('active');
 };
+
+document.addEventListener('DOMContentLoaded', () => {
+  const sections = {
+    about: document.getElementById('section-about'),
+    play: document.getElementById('section-play'),
+    stats: document.getElementById('section-stats')
+  };
+
+  const buttons = {
+    about: document.getElementById('btn-about'),
+    play: document.getElementById('btn-play'),
+    stats: document.getElementById('btn-stats')
+  };
+
+  function showSection(name) {
+    Object.values(sections).forEach(section => section.classList.add('hidden'));
+    sections[name].classList.remove('hidden');
+  }
+
+  buttons.about.addEventListener('click', () => navigate('about'));
+  buttons.play.addEventListener('click', () => navigate('play'));
+  buttons.stats.addEventListener('click', () => navigate('stats'));
+
+  showSection('about');
+});
 

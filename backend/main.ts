@@ -1,4 +1,12 @@
 import { serve } from "https://deno.land/std/http/server.ts";
+import { serveDir } from "https://deno.land/std@0.224.0/http/file_server.ts";
+
+Deno.serve((req) => serveDir(req, {
+  fsRoot: ".",
+  urlRoot: "",
+  showDirListing: false,
+  enableCors: true,
+}));
 
 const kv = await Deno.openKv();
 
