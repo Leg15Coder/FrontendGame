@@ -1,0 +1,60 @@
+<!doctype html>
+<html class="no-js" lang="ru">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title></title>
+  <link rel="stylesheet" href="css/style.css">
+  <meta name="description" content="">
+
+  <meta property="og:title" content="">
+  <meta property="og:type" content="">
+  <meta property="og:url" content="">
+  <meta property="og:image" content="">
+  <meta property="og:image:alt" content="">
+
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" href="/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon.png">
+
+  <link rel="manifest" href="site.webmanifest">
+  <meta name="theme-color" content="#fafafa">
+</head>
+
+<body>
+  <header>
+    <h1>🎮 Game Walk</h1>
+    <nav>
+      <button onclick="navigate('about')">Об игре</button>
+      <button onclick="navigate('game')">Играть</button>
+      <button onclick="navigate('records')">Рекорды</button>
+    </nav>
+  </header>
+
+  <main>
+    <section id="aboutSection">
+      <h2>Правила игры</h2>
+      <p>
+        Вы играете за героя, которому нужно пройти до выхода.
+        На пути встречаются ловушки (огонь, враги), которые отнимают очки.
+        Если очки опустятся слишком низко, игра закончится.
+        После прохождения уровня вы переходите на следующий, сложность растёт!
+      </p>
+    </section>
+
+    <section id="gameSection" style="display: none;">
+      <div id="info">Level: 1 | Score: 0</div>
+      <div id="game"></div>
+    </section>
+
+    <section id="recordsSection" style="display: none;">
+      <div id="records"></div>
+    </section>
+  </main>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+
+
+</html>
