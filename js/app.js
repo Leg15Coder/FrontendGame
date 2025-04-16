@@ -116,10 +116,8 @@ async function gameOver() {
         await fetch(`${API_URL}/api/record`, {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
+            'Content-Type': 'application/json'
           },
-          mode: 'cors',
           body: JSON.stringify(record)
         });
       }
@@ -150,7 +148,7 @@ window.addEventListener('keydown', (e) => {
 startLevel();
 
 window.showRecords = async function () {
-  const res = await fetch(`${API_URL}/api/record`);
+  const res = await fetch(`${API_URL}/api/records`);
   const records = await res.json();
 
   const table = `

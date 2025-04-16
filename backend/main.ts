@@ -10,7 +10,13 @@ serve(async (req) => {
     const body = await req.json();
     const id = `${Date.now()}-${crypto.randomUUID()}`;
     await kv.set(["records", id], body);
-    return new Response("OK", { status: 201 });
+    return new Response("OK", {
+      status: 201,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "POST, OPTIONS",
+      }
+    });
   }
 
   if (req.method === "GET" && url.pathname === "/api/records") {
@@ -21,7 +27,13 @@ serve(async (req) => {
     }
 
     records.sort((a, b) => b.score - a.score || new Date(a.time) - new Date(b.time));
-    return Response.json(records.slice(0, 100));
+    return new Response(JSON.stringify(records.slice(0, 100)), {
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",  // Разрешить все домены
+        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",  // Разрешенные методы
+      }
+    });
   }
 
   return serveDir(req, {
