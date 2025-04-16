@@ -1,7 +1,7 @@
 import { generateMap } from './generator.js';
 import { renderGame, renderUI } from './game-interface.js';
 
-const API_URL = "https://leg15coder-frontendgam-30.deno.dev";
+const API_URL = "https://leg15coder-devdungeon.deno.dev";
 
 let level = 1;
 let score = 0;
