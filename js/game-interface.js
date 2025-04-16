@@ -45,6 +45,6 @@ export function renderUI(player, grid, score, level, health) {
 
   const info = document.getElementById('info');
   if (info) {
-    info.innerText = `Level: ${level} | Score: ${score} | Health: ${health}`;
+    info.innerText = `Уровень: ${level} | Очки: ${score} | Здоровье: ${health}`;
   }
 }

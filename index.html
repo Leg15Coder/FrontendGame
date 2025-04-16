@@ -22,23 +22,23 @@
 </head>
 
 <body>
-  <header>🔥 Ходилка — Приключение начинается!</header>
+<header>🔥 <b>Dev Dungeon</b> — Приключение начинается!</header>
 
   <nav>
     <button id="btn-about">Об игре</button>
     <button id="btn-play">Играть</button>
-    <button id="btn-stats">Результаты</button>
+    <button id="btn-stats">Лидеры</button>
   </nav>
 
   <main>
     <section id="section-about" class="section active">
-      <h2>Как играть</h2>
-      <p>Передвигайся по карте, избегай врагов и ловушек, найди выход. С каждым уровнем всё сложнее!</p>
+      <h2>Как играть?</h2>
+      <p>Передвигайся по карте, избегая врагов и ловушек! Найди путь к выходу и собери все пасхалки игры! С каждым уровнем игра становится всё сложнее и появляются новые возможности. Не забывай следить за своим здоровьем: когда оно достигнет нуля - ты проиграешь! Удачи!</p>
     </section>
 
     <section id="section-play" class="section hidden">
       <h2>Игра</h2>
-      <div id="info">Level: 1 | Score: 0</div>
+      <div id="info"></div>
       <div id="game"></div>
     </section>
 
@@ -50,13 +50,13 @@
 
   <div class="modal-overlay hidden">
     <div class="modal-content">
-      <div class="modal-title">GAME OVER!</div>
-      <div>Your score: ${score}</div>
-      <div>Level reached: ${level}</div>
-      <input type="text" class="modal-input" placeholder="Enter your name" id="player-name">
+      <div class="modal-title">КОНЕЦ!</div>
+      <div id="scores">Очков набрано: ${score}</div>
+      <div id="levels">Уровней пройдено: ${level}</div>
+      <input type="text" class="modal-input" placeholder="Введите свой ник" id="player-name">
       <div>
-        <button class="modal-button" id="submit-score">Submit</button>
-        <button class="modal-button" id="skip-submit">Skip</button>
+        <button class="modal-button" id="submit-score">Сохранить</button>
+        <button class="modal-button" id="skip-submit">Скип</button>
       </div>
     </div>
   </div>

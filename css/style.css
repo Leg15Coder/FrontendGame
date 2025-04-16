@@ -193,6 +193,7 @@ main {
   padding: 2rem;
   min-height: 60vh;
   animation: slideUp 0.7s ease-out;
+  align-items: center;
 }
 
 @keyframes fadeIn {

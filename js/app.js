@@ -43,11 +43,12 @@ function movePlayer(dx, dy) {
     return startLevel();
   }
 
+  moveEnemies();
+
   if (health <= 0) {
     return gameOver();
   }
 
-  moveEnemies();
   renderUI(player, grid, score, level, health);
 }
 
@@ -89,9 +90,6 @@ function moveEnemies() {
   for (let enemy of grid.units) {
     if (enemy.type === 'enemy' && enemy.x === player.x && enemy.y === player.y) {
       health -= 20;
-      if (score <= 0) {
-        return gameOver();
-      }
     }
   }
 }
@@ -105,6 +103,10 @@ function resetGame() {
 
 async function gameOver() {
   const modal = document.getElementsByClassName('modal-overlay').item(0);
+  const scores_modal = document.getElementById('scores');
+  const levels_modal = document.getElementById('levels');
+  scores_modal.innerHTML = `Очков набрано: ${score}`
+  levels_modal.innerHTML = `Уровней пройдено: ${level}`
   modal.classList.remove('hidden');
 
   return new Promise((resolve) => {
