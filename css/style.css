@@ -99,35 +99,34 @@ body {
 }
 
 #game {
-  display: inline-block;
-  border: 2px solid #444;
-  background: #222;
+  position: relative;
+  width: fit-content;
+  height: fit-content;
+  display: grid;
+  grid-template-columns: repeat(20, 32px);
+  grid-template-rows: repeat(20, 32px);
 }
 
 .row {
   display: flex;
 }
 
+/* Клетки */
+
 .cell {
-  width: 30px;
-  height: 30px;
-  margin: 1px;
+  width: 32px;
+  height: 32px;
   box-sizing: border-box;
-  background-color: #333;
-  border-radius: 4px;
+  border: 1px solid #444;
+  background-color: #111;
 }
 
-/* Клетки */
 .cell.wall {
   background-color: #555;
 }
 
 .cell.fire {
   background-color: orangered;
-}
-
-.cell.enemy {
-  background-color: crimson;
 }
 
 .cell.exit {
@@ -138,9 +137,21 @@ body {
   background-color: royalblue;
 }
 
-.cell.player {
+.unit {
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  transition: transform 0.2s ease;
+  z-index: 10;
+}
+
+.player {
   background-color: gold;
   border: 2px solid white;
+}
+
+.enemy {
+  background-color: cyan;
 }
 
 header {

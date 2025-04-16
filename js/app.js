@@ -1,5 +1,5 @@
 import { generateMap } from './generator.js';
-import { renderGame } from './game-interface.js';
+import { renderGame, renderUI } from './game-interface.js';
 
 const API_URL = "https://leg15coder-frontendgam-30.deno.dev";
 
@@ -12,7 +12,7 @@ let map = [];
 function findStart(map) {
   for (let y = 0; y < map.length; y++) {
     for (let x = 0; x < map[0].length; x++) {
-      if (map[y][x] === 'start') return { x, y };
+      if (map[y][x].type === 'start') return { x, y };
     }
   }
   return { x: 1, y: 1 };
@@ -21,7 +21,7 @@ function findStart(map) {
 function startLevel() {
   map = generateMap(level);
   player = findStart(map);
-  renderGame(map, player, score, level);
+  renderGame(map, player, score, level, health);
 }
 
 function movePlayer(dx, dy) {
@@ -31,24 +31,81 @@ function movePlayer(dx, dy) {
   if (newY < 0 || newY >= map.length || newX < 0 || newX >= map[0].length) return;
   const nextCell = map[newY][newX];
 
-  if (nextCell === 'wall') return;
+  if (nextCell.type === 'wall') return;
 
   player.x = newX;
   player.y = newY;
 
-  if (nextCell === 'fire') score -= 10;
-  if (nextCell === 'enemy') score -= 20;
-  if (nextCell === 'exit') {
+  if (nextCell.type === 'fire') health -= 2;
+  if (nextCell.type === 'exit') {
     score += 100;
     level++;
     return startLevel();
   }
 
-  if (score < -50) {
+  if (health <= 0) {
     return gameOver();
   }
 
-  renderGame(map, player, score, level);
+  moveEnemies();
+  renderUI(player, map, score, level, health);
+}
+
+function moveEnemies() {
+  const newMap = map.map(row => row.slice());
+  for (let y = 0; y < map.length; y++) {
+    for (let x = 0; x < map[0].length; x++) {
+      const cell = map[y][x];
+      if (cell.type === 'enemy') {
+        const { type, behavior, direction } = cell;
+        let dx = 0, dy = 0;
+
+        if (behavior === 'horizontal') {
+          dx = direction === 1 ? 1 : -1;
+        } else if (behavior === 'vertical') {
+          dy = direction === 1 ? 1 : -1;
+        } else if (behavior === 'random') {
+          const dirs = [[1,0], [-1,0], [0,1], [0,-1]];
+          [dx, dy] = dirs[Math.floor(Math.random() * dirs.length)];
+        } else if (behavior === 'follow') {
+          dx = player.x > x ? 1 : player.x < x ? -1 : 0;
+          dy = player.y > y ? 1 : player.y < y ? -1 : 0;
+        }
+
+        const newX = x + dx;
+        const newY = y + dy;
+
+        if (
+          newY >= 0 && newY < map.length &&
+          newX >= 0 && newX < map[0].length &&
+          map[newY][newX].type !== 'wall' &&
+          map[newY][newX].type !== 'exit'
+        ) {
+          newMap[y][x] = null;
+          newMap[newY][newX] = { ...cell, direction };
+        } else {
+          if (behavior === 'horizontal' || behavior === 'vertical') {
+            cell.direction *= -1;
+          }
+        }
+      }
+    }
+  }
+
+  for (let y = 0; y < map.length; y++) {
+    for (let x = 0; x < map[0].length; x++) {
+      if (newMap[y][x] === null) newMap[y][x] = { type: 'empty' };
+    }
+  }
+
+  map = newMap;
+
+  if (map[player.y][player.x].type === 'enemy') {
+    health -= 20;
+    if (score <= 0) {
+      return gameOver();
+    }
+  }
 }
 
 async function gameOver() {
@@ -64,6 +121,7 @@ async function gameOver() {
   }
 
   score = 0;
+  health = 20;
   level = 1;
   startLevel();
 }
@@ -74,6 +132,7 @@ window.addEventListener('keydown', (e) => {
     case 'ArrowDown': movePlayer(0, 1); break;
     case 'ArrowLeft': movePlayer(-1, 0); break;
     case 'ArrowRight': movePlayer(1, 0); break;
+    case ' ': movePlayer(0, 0); break;
   }
 });
 
