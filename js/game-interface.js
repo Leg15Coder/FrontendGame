@@ -1,12 +1,11 @@
 let playerDiv;
-let enemyDivs = [];
 
-export function renderGame(map, player, score, level, health) {
+export function renderGame(grid, player, score, level, health) {
   const container = document.getElementById('game');
   container.innerHTML = '';
 
-  const width = map[0].length;
-  const height = map.length;
+  const width = grid.map[0].length;
+  const height = grid.map.length;
 
   container.style.gridTemplateColumns = `repeat(${width}, 32px)`;
   container.style.gridTemplateRows = `repeat(${height}, 32px)`;
@@ -16,7 +15,7 @@ export function renderGame(map, player, score, level, health) {
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
       const cellDiv = document.createElement('div');
-      cellDiv.className = 'cell ' + map[y][x].type;
+      cellDiv.className = 'cell ' + grid.map[y][x].type;
       container.appendChild(cellDiv);
     }
   }
@@ -25,29 +24,24 @@ export function renderGame(map, player, score, level, health) {
   playerDiv.className = 'unit player';
   container.appendChild(playerDiv);
 
-  enemyDivs = [];
-  for (let y = 0; y < height; y++) {
-    for (let x = 0; x < width; x++) {
-      if (map[y][x].type === 'enemy') {
-        const enemyDiv = document.createElement('div');
-        enemyDiv.className = 'unit enemy';
-        container.appendChild(enemyDiv);
-        enemyDivs.push({ div: enemyDiv, x, y });
-      }
-    }
-  }
+  grid.units = grid.units.map(unit => {
+    const enemyDiv = document.createElement('div');
+    enemyDiv.className = 'unit enemy';
+    enemyDiv.style.transition = 'transform 0.2s ease';
+    container.appendChild(enemyDiv);
+    return { ...unit, div: enemyDiv };
+  });
 
-  renderUI(player, map, score, level, health);
+  renderUI(player, grid, score, level, health);
 }
 
-export function renderUI(player, map, score, level, health) {
+export function renderUI(player, grid, score, level, health) {
   playerDiv.style.transform = `translate(${player.x * 32}px, ${player.y * 32}px)`;
 
-  enemyDivs.forEach(enemy => {
-    const cell = map[enemy.y][enemy.x];
-    if (cell.type !== 'enemy') return;
-    enemy.div.style.transform = `translate(${enemy.x * 32}px, ${enemy.y * 32}px)`;
+  grid.units.forEach(unit => {
+    unit.div.style.transform = `translate(${unit.x * 32}px, ${unit.y * 32}px)`;
   });
+
 
   const info = document.getElementById('info');
   if (info) {
