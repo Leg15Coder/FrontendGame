@@ -150,9 +150,9 @@ window.showRecords = async function () {
   const records = await res.json();
 
   const table = `
-    <table border="1" cellpadding="6" style="margin: auto; background: #222; color: white;">
+    <table border="1" cellpadding="6" style="margin: auto; background: #222; color: white;" class="leaderboard">
       <tr>
-        <th>#</th><th>Name</th><th>Score</th><th>Level</th><th>Time</th>
+        <th>№</th><th>Ник</th><th>Очки</th><th>Уровень</th><th>Время</th>
       </tr>
       ${records.map((r, i) => `
         <tr>

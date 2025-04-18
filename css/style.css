@@ -272,6 +272,46 @@ main {
   background: #ff3333;
 }
 
+.leaderboard {
+  width: 85%;
+  margin: 2rem auto;
+  border-collapse: collapse;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.leaderboard th,
+.leaderboard td {
+  padding: 1rem 1.5rem;
+  text-align: left;
+}
+
+.leaderboard thead {
+  background-color: #292944;
+  color: #fff;
+}
+
+.leaderboard tbody tr:nth-child(odd) {
+  background-color: #333;
+}
+
+.leaderboard tbody tr:nth-child(even) {
+  background-color: #444;
+}
+
+.leaderboard tbody tr:hover {
+  background-color: #293229;
+  cursor: pointer;
+}
+
+.leaderboard th {
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
 /* ==========================================================================
    Helper classes
    ========================================================================== */
