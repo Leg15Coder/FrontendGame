@@ -4,6 +4,9 @@ import { playEnemyBehavior } from './behaviors.js'
 
 const API_URL = "https://leg15coder-devdungeon.deno.dev";
 
+let touchStartX = null;
+let touchStartY = null;
+
 let level = 1;
 let score = 0;
 let health = 20;
@@ -206,3 +209,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
   showSection('about');
 });
+
+document.addEventListener("touchstart", e => {
+  touchStartX = e.changedTouches[0].screenX;
+  touchStartY = e.changedTouches[0].screenY;
+}, false);
+
+document.addEventListener("touchend", e => {
+  if (!touchStartX || !touchStartY) return;
+
+  const deltaX = e.changedTouches[0].screenX - touchStartX;
+  const deltaY = e.changedTouches[0].screenY - touchStartY;
+
+  if (Math.abs(deltaX) > Math.abs(deltaY)) {
+    if (deltaX > 30) movePlayer(1, 0);
+    else if (deltaX < -30) movePlayer(-1, 0);
+    else movePlayer(0, 0);
+  } else {
+    if (deltaY > 30) movePlayer(0, 1);
+    else if (deltaY < -30) movePlayer(0, -1);
+    else movePlayer(0, 0);
+  }
+
+  touchStartX = null;
+  touchStartY = null;
+}, false);
+
