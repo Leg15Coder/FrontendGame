@@ -49,9 +49,17 @@ export function renderUI(player, grid, score, level, health) {
   player.div.style.transform = `translate(${player.x * cellSize}px, ${player.y * cellSize}px)`;
 
   grid.units.forEach(unit => {
+    if (unit.div === null) {
+      const container = document.getElementById('game');
+      const enemyDiv = document.createElement('div');
+      enemyDiv.className = 'unit enemy';
+      enemyDiv.style.transition = 'transform 0.2s ease';
+      container.appendChild(enemyDiv);
+      unit.div = enemyDiv;
+    }
+
     unit.div.style.transform = `translate(${unit.x * cellSize}px, ${unit.y * cellSize}px)`;
   });
-
 
   const info = document.getElementById('info');
   if (info) {

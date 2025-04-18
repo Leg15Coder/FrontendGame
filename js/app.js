@@ -1,5 +1,6 @@
 import { generateMap } from './generator.js';
 import { renderGame, renderUI } from './game-interface.js';
+import { playEnemyBehavior } from './behaviors.js'
 
 const API_URL = "https://leg15coder-devdungeon.deno.dev";
 
@@ -8,6 +9,7 @@ let score = 0;
 let health = 20;
 let player = { x: 1, y: 1 };
 let grid;
+let timer = 0;
 
 function findStart(map) {
   for (let y = 0; y < map.length; y++) {
@@ -19,6 +21,7 @@ function findStart(map) {
 }
 
 function startLevel() {
+  timer = 0;
   grid = generateMap(level);
   player = findStart(grid.map);
   renderGame(grid, player, score, level, health);
@@ -27,6 +30,7 @@ function startLevel() {
 function movePlayer(dx, dy) {
   const newX = player.x + dx;
   const newY = player.y + dy;
+  timer++;
 
   if (newY < 0 || newY >= grid.map.length || newX < 0 || newX >= grid.map[0].length) return;
   const nextCell = grid.map[newY][newX];
@@ -56,19 +60,8 @@ function moveEnemies() {
   const newUnits = [];
   for (let enemy of grid.units) {
     const { x, y, type, behavior, id, div } = enemy;
-    let dx = 0, dy = 0;
 
-    if (behavior === 'horizontal') {
-      dx = 1
-    } else if (behavior === 'vertical') {
-      dy = 1;
-    } else if (behavior === 'random') {
-      const dirs = [[1,0], [-1,0], [0,1], [0,-1]];
-      [dx, dy] = dirs[Math.floor(Math.random() * dirs.length)];
-    } else if (behavior === 'follow') {
-      dx = player.x > x ? 1 : player.x < x ? -1 : 0;
-      dy = player.y > y ? 1 : player.y < y ? -1 : 0;
-    }
+    let [ dx, dy ] = playEnemyBehavior(enemy, grid, timer, player)
 
     const newX = x + dx;
     const newY = y + dy;

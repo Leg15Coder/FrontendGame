@@ -4,6 +4,12 @@ const minWidth = 8, minHeight = 8;
 const maxWidth = 128, maxHeight = 48;
 const enemyTypes = ['enemy']
 
+const enemyTypes = ['worm', 'bug', 'zombie', 'spy', 'backdoor'];
+
+function chooseEnemyType(level) {
+  return enemyTypes[Math.floor(Math.random() * enemyTypes.length)];
+}
+
 export function generateMap(level) {
   const delta = () => Math.floor(Math.random() * 5 + 0.5) - 2;
   prevWidth = Math.max(minWidth, Math.min(maxWidth, prevWidth + delta()));
@@ -40,7 +46,7 @@ export function generateMap(level) {
       y = Math.floor(Math.random() * height);
     } while (map[y][x].type !== 'empty');
 
-    units.push({ x: x, y: y, type: 'enemy', behavior: enemyTypes[Math.floor(Math.random() * enemyTypes.length)], id: ids++, div: null });
+    units.push({ x: x, y: y, type: 'enemy', behavior: chooseEnemyType(level), id: ids++, div: null });
   }
 
   return {
