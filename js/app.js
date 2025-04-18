@@ -206,4 +206,3 @@ document.addEventListener('DOMContentLoaded', () => {
 
   showSection('about');
 });
-

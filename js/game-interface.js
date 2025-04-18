@@ -1,4 +1,7 @@
-let playerDiv;
+const maxCellSize = 48;
+const minCellSize = 12;
+
+let cellSize;
 
 export function renderGame(grid, player, score, level, health) {
   const container = document.getElementById('game');
@@ -7,10 +10,13 @@ export function renderGame(grid, player, score, level, health) {
   const width = grid.map[0].length;
   const height = grid.map.length;
 
-  container.style.gridTemplateColumns = `repeat(${width}, 32px)`;
-  container.style.gridTemplateRows = `repeat(${height}, 32px)`;
-  container.style.width = `${width * 32}px`;
-  container.style.height = `${height * 32}px`;
+  const maxContainerWidth = window.innerWidth - 40;
+  cellSize = Math.max(minCellSize, Math.min(maxCellSize, Math.floor(maxContainerWidth / width)));
+
+  container.style.gridTemplateColumns = `repeat(${width}, ${cellSize}px)`;
+  container.style.gridTemplateRows = `repeat(${height}, ${cellSize}px)`;
+  container.style.width = `${width * cellSize}px`;
+  container.style.height = `${height * cellSize}px`;
 
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
@@ -20,12 +26,16 @@ export function renderGame(grid, player, score, level, health) {
     }
   }
 
-  playerDiv = document.createElement('div');
-  playerDiv.className = 'unit player';
-  container.appendChild(playerDiv);
+  player.div = document.createElement('div');
+  player.div.className = 'unit player';
+  player.div.style.width = `${cellSize}px`;
+  player.div.style.height = `${cellSize}px`;
+  container.appendChild(player.div);
 
   grid.units = grid.units.map(unit => {
     const enemyDiv = document.createElement('div');
+    enemyDiv.style.width = `${cellSize}px`;
+    enemyDiv.style.height = `${cellSize}px`;
     enemyDiv.className = 'unit enemy';
     enemyDiv.style.transition = 'transform 0.2s ease';
     container.appendChild(enemyDiv);
@@ -36,7 +46,7 @@ export function renderGame(grid, player, score, level, health) {
 }
 
 export function renderUI(player, grid, score, level, health) {
-  playerDiv.style.transform = `translate(${player.x * 32}px, ${player.y * 32}px)`;
+  player.div.style.transform = `translate(${player.x * cellSize}px, ${player.y * cellSize}px)`;
 
   grid.units.forEach(unit => {
     if (unit.div === null) {
@@ -48,7 +58,7 @@ export function renderUI(player, grid, score, level, health) {
       unit.div = enemyDiv;
     }
 
-    unit.div.style.transform = `translate(${unit.x * 32}px, ${unit.y * 32}px)`;
+    unit.div.style.transform = `translate(${unit.x * cellSize}px, ${unit.y * cellSize}px)`;
   });
 
   const info = document.getElementById('info');

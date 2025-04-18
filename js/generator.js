@@ -1,3 +1,9 @@
+let prevWidth = 16;
+let prevHeight = 10;
+const minWidth = 8, minHeight = 8;
+const maxWidth = 128, maxHeight = 48;
+const enemyTypes = ['enemy']
+
 const enemyTypes = ['worm', 'bug', 'zombie', 'spy', 'backdoor'];
 
 function chooseEnemyType(level) {
@@ -5,22 +11,27 @@ function chooseEnemyType(level) {
 }
 
 export function generateMap(level) {
-  const width = 15 + level;
-  const height = 9 + level;
-  const map = [];
-  const units = [];
-  let ids = 0;
+  const delta = () => Math.floor(Math.random() * 5 + 0.5) - 2;
+  prevWidth = Math.max(minWidth, Math.min(maxWidth, prevWidth + delta()));
+  prevHeight = Math.max(minHeight, Math.min(maxHeight, prevHeight + delta()));
 
-  for (let y = 0; y < height; y++) {
-    const row = [];
-    for (let x = 0; x < width; x++) {
-      row.push({ type: (Math.random() < 0.1 ? 'wall' : 'empty') });
+  let map, units = [], width = prevWidth, height = prevHeight, ids = 0;
+
+  while (true) {
+    map = [];
+    for (let y = 0; y < height; y++) {
+      const row = [];
+      for (let x = 0; x < width; x++) {
+        row.push({ type: Math.random() < Math.random() / 3 ? 'wall' : 'empty' });
+      }
+      map.push(row);
     }
-    map.push(row);
-  }
 
-  map[1][1] = { type: 'start' };
-  map[height - 2][width - 2] = { type: 'exit' };
+    map[1][1] = { type: 'start' };
+    map[height - 2][width - 2] = { type: 'exit' };
+
+    if (checkMap(map, 1, 1)) break;
+  }
 
   for (let i = 0; i < level + 2; i++) {
     const x = Math.floor(Math.random() * width);
@@ -42,4 +53,40 @@ export function generateMap(level) {
     map: map,
     units: units
   };
+}
+
+function checkMap(map, startX, startY) {
+  const height = map.length;
+  const width = map[0].length;
+  const visited = Array.from({ length: height }, () => Array(width).fill(false));
+  const queue = [[startX, startY]];
+  visited[startY][startX] = true;
+
+  const directions = [[0,1],[1,0],[-1,0],[0,-1]];
+  let reachable = 1;
+
+  while (queue.length) {
+    const [x, y] = queue.shift();
+    for (const [dx, dy] of directions) {
+      const nx = x + dx, ny = y + dy;
+      if (ny >= 0 && ny < height && nx >= 0 && nx < width && !visited[ny][nx]) {
+        const cell = map[ny][nx];
+        if (cell.type !== 'wall') {
+          visited[ny][nx] = true;
+          queue.push([nx, ny]);
+        }
+      }
+    }
+  }
+
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const cell = map[y][x];
+      if (cell.type !== 'wall' && !visited[y][x]) {
+        return false;
+      }
+    }
+  }
+
+  return true;
 }
