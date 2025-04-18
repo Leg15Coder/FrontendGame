@@ -2,8 +2,6 @@ let prevWidth = 16;
 let prevHeight = 10;
 const minWidth = 8, minHeight = 8;
 const maxWidth = 128, maxHeight = 48;
-const enemyTypes = ['enemy']
-
 const enemyTypes = ['worm', 'bug', 'zombie', 'spy', 'backdoor'];
 
 function chooseEnemyType(level) {
