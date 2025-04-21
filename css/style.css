@@ -123,6 +123,18 @@ body {
   background-color: #555;
 }
 
+.cell.portal {
+  background-color: #727;
+}
+
+.cell.heal {
+  background-color: #f99;
+}
+
+.cell.scoreUp {
+  background-color: #ee5;
+}
+
 .cell.fire {
   background-color: orangered;
 }

@@ -1,5 +1,5 @@
 import { generateMap } from './generator.js';
-import { renderGame, renderUI } from './game-interface.js';
+import { renderGame } from './game-interface.js';
 import { playEnemyBehavior } from './behaviors.js'
 
 const API_URL = "https://leg15coder-devdungeon.deno.dev";
@@ -27,27 +27,46 @@ function startLevel() {
   timer = 0;
   grid = generateMap(level);
   player = findStart(grid.map);
-  renderGame(grid, player, score, level, health);
+  renderGame(grid, player, score, level, health, true);
 }
 
 function movePlayer(dx, dy) {
-  const newX = player.x + dx;
-  const newY = player.y + dy;
+  let newX = player.x + dx;
+  let newY = player.y + dy;
   timer++;
 
   if (newY < 0 || newY >= grid.map.length || newX < 0 || newX >= grid.map[0].length) return;
-  const nextCell = grid.map[newY][newX];
+  let nextCell = grid.map[newY][newX];
 
   if (nextCell.type === 'wall') return;
+  if (dx === 0 && dy === 0 && nextCell.type === 'portal') {
+    let targetPortal = grid.portals[Math.floor(Math.random() * grid.portals.length)]
+    newY = targetPortal.y;
+    newX = targetPortal.x;
+    nextCell = grid.map[newY][newX];
+  }
 
   player.x = newX;
   player.y = newY;
 
   if (nextCell.type === 'fire') health -= 2;
-  if (nextCell.type === 'exit') {
-    score += 100;
+  else if (nextCell.type === 'heal') {
+    health += 5;
+    grid.map[newY][newX].type = 'empty';
+  } else if (nextCell.type === 'scoreUp') {
+    score += 50;
+    grid.map[newY][newX].type = 'empty';
+  } else if (nextCell.type === 'exit') {
+    score += 10;
     level++;
     return startLevel();
+  } else if (nextCell.type === 'portal') {
+    const hintDiv = document.getElementsByClassName("hint").item(0);
+    hintDiv.classList.remove('hidden');
+    hintDiv.innerHTML = 'Нажмите пробел чтобы телепортироваться'
+  } else {
+    const hintDiv = document.getElementsByClassName("hint").item(0);
+    hintDiv.classList.add('hidden');
   }
 
   moveEnemies();
@@ -56,7 +75,7 @@ function movePlayer(dx, dy) {
     return gameOver();
   }
 
-  renderUI(player, grid, score, level, health);
+  renderGame(grid, player, score, level, health, false);
 }
 
 function moveEnemies() {

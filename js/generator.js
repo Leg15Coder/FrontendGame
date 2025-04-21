@@ -1,7 +1,7 @@
 let prevWidth = 16;
 let prevHeight = 10;
 const minWidth = 8, minHeight = 8;
-const maxWidth = 128, maxHeight = 48;
+const maxWidth = 128, maxHeight = 64;
 const enemyTypes = ['worm', 'bug', 'zombie', 'spy', 'backdoor'];
 
 function chooseEnemyType(level) {
@@ -13,14 +13,29 @@ export function generateMap(level) {
   prevWidth = Math.max(minWidth, Math.min(maxWidth, prevWidth + delta()));
   prevHeight = Math.max(minHeight, Math.min(maxHeight, prevHeight + delta()));
 
-  let map, units = [], width = prevWidth, height = prevHeight, ids = 0;
+  let map, portals, baths, units = [], width = prevWidth, height = prevHeight, ids = 0;
 
   while (true) {
     map = [];
+    portals = [];
+    baths = [];
     for (let y = 0; y < height; y++) {
       const row = [];
       for (let x = 0; x < width; x++) {
-        row.push({ type: Math.random() < Math.random() / 3 ? 'wall' : 'empty' });
+        if (Math.random() < Math.random() / 3) {
+          row.push({ type: 'wall' });
+        } else if (level > 5 && Math.random() < Math.random() / 25) {
+          row.push({ type: 'portal' });
+          portals.push({ x: x, y: y })
+        } else if (level > 3 && Math.random() < Math.random() / 50) {
+          row.push({ type: 'heal' });
+          baths.push({ x: x, y: y, type: 'heal' })
+        } else if (level > 7 && Math.random() < Math.random() / 50) {
+          row.push({ type: 'scoreUp' });
+          baths.push({ x: x, y: y, type: 'scoreUp' })
+        } else {
+          row.push({ type: 'empty' });
+        }
       }
       map.push(row);
     }
@@ -31,13 +46,13 @@ export function generateMap(level) {
     if (checkMap(map, 1, 1)) break;
   }
 
-  for (let i = 0; i < level + 2; i++) {
+  for (let i = 0; i < Math.floor(Math.random() * level); i++) {
     const x = Math.floor(Math.random() * width);
     const y = Math.floor(Math.random() * height);
     if (map[y][x].type === 'empty') map[y][x] = { type: 'fire' };
   }
 
-  for (let i = 0; i < level; i++) {
+  for (let i = 0; i < Math.floor(Math.random() * level) + 1; i++) {
     let x, y;
     do {
       x = Math.floor(Math.random() * width);
@@ -49,7 +64,8 @@ export function generateMap(level) {
 
   return {
     map: map,
-    units: units
+    units: units,
+    portals: portals
   };
 }
 
