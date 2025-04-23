@@ -152,12 +152,21 @@ async function gameOver() {
   });
 }
 
-window.addEventListener('keydown', (e) => {
-  switch (e.key) {
+window.addEventListener('keydown', (event) => {
+  const keys = ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", " "];
+  if (keys.includes(event.key)) {
+    event.preventDefault();
+  }
+
+  switch (event.key) {
     case 'ArrowUp': movePlayer(0, -1); break;
+    case 'w': movePlayer(0, -1); break;
     case 'ArrowDown': movePlayer(0, 1); break;
+    case 's': movePlayer(0, 1); break;
     case 'ArrowLeft': movePlayer(-1, 0); break;
+    case 'a': movePlayer(-1, 0); break;
     case 'ArrowRight': movePlayer(1, 0); break;
+    case 'd': movePlayer(1, 0); break;
     case ' ': movePlayer(0, 0); break;
   }
 });

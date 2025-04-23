@@ -10,7 +10,7 @@ export function renderGame(grid, player, score, level, health, start) {
   const height = grid.map.length;
 
   if (start) {
-    cellSize = Math.max(minCellSize, Math.min(maxCellSize, Math.floor(window.innerWidth - 40 / width)));
+    cellSize = Math.max(minCellSize, Math.min(maxCellSize, Math.floor(window.innerWidth / width)));
 
     container.innerHTML = '';
     container.style.gridTemplateColumns = `repeat(${width}, ${cellSize}px)`;
@@ -54,4 +54,16 @@ export function renderGame(grid, player, score, level, health, start) {
 
   const info = document.getElementById('info');
   info.innerText = `Уровень: ${level} | Очки: ${score} | Здоровье: ${health}`;
+
+  centerCameraOnPlayer(player);
 }
+
+function centerCameraOnPlayer(player) {
+  if (player.div) {
+    player.div.scrollIntoView({
+      behavior: "smooth",
+      block: "center",
+    });
+  }
+}
+
