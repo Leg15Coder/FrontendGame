@@ -3,8 +3,13 @@ export function playEnemyBehavior(enemy, grid, timer, player) {
 
   switch (enemy.behavior) {
     case 'worm':
-      const dirs = [[1,0], [-1,0], [0,1], [0,-1]];
+      const dirs = [[1,0], [-1,0], [0,1], [0,-1], [0, 0]];
       let turn;
+
+      if (distance(enemy, player) === 0) {
+        [dx, dy] = [0, 0];
+        break;
+      }
 
       do {
         [dx, dy] = dirs[Math.floor(Math.random() * dirs.length)];
@@ -21,8 +26,10 @@ export function playEnemyBehavior(enemy, grid, timer, player) {
 
     case 'zombie': {
       const dist = distance(player, enemy);
-      if (dist <= 5) {
-        const dirs = [[1,0], [-1,0], [0,1], [0,-1]];
+      if (dist === 0) {
+        [dx, dy] = [0, 0];
+      } else if (dist <= 5) {
+        const dirs = [[1,0], [-1,0], [0,1], [0,-1], [0, 0]];
         let turn;
 
         do {

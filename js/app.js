@@ -13,6 +13,7 @@ let health = 20;
 let player = { x: 1, y: 1 };
 let grid;
 let timer = 0;
+let isGameOver = false;
 
 function findStart(map) {
   for (let y = 0; y < map.length; y++) {
@@ -72,6 +73,7 @@ function movePlayer(dx, dy) {
   moveEnemies();
 
   if (health <= 0) {
+    renderGame(grid, player, score, level, health, false);
     return gameOver();
   }
 
@@ -81,9 +83,16 @@ function movePlayer(dx, dy) {
 function moveEnemies() {
   const newUnits = [];
   for (let enemy of grid.units) {
-    const { x, y, type, behavior, id, div } = enemy;
+    let { x, y, type, behavior, id, div, cooldown } = enemy;
+    let dx, dy;
 
-    let [ dx, dy ] = playEnemyBehavior(enemy, grid, timer, player)
+    if (cooldown <= 0) {
+      [dx, dy] = playEnemyBehavior(enemy, grid, timer, player)
+      cooldown = 0;
+    } else {
+      [dx, dy] = [0, 0];
+      cooldown--;
+    }
 
     const newX = x + dx;
     const newY = y + dy;
@@ -94,8 +103,9 @@ function moveEnemies() {
       grid.map[newY][newX].type !== 'wall' &&
       grid.map[newY][newX].type !== 'exit'
     ) {
-      newUnits.push({ x: newX, y: newY, type, behavior, id, div });
+      newUnits.push({ x: newX, y: newY, type, behavior, id, div, cooldown });
     } else {
+      enemy.cooldown = cooldown;
       newUnits.push(enemy);
     }
   }
@@ -104,6 +114,7 @@ function moveEnemies() {
 
   for (let enemy of grid.units) {
     if (enemy.type === 'enemy' && enemy.x === player.x && enemy.y === player.y) {
+      enemy.cooldown++;
       health -= 20;
     }
   }
@@ -113,6 +124,7 @@ function resetGame() {
   score = 0;
   health = 20;
   level = 1;
+  isGameOver = false;
   startLevel();
 }
 
@@ -120,6 +132,7 @@ async function gameOver() {
   const modal = document.getElementsByClassName('modal-overlay').item(0);
   const scores_modal = document.getElementById('scores');
   const levels_modal = document.getElementById('levels');
+  isGameOver = true;
   scores_modal.innerHTML = `Очков набрано: ${score}`
   levels_modal.innerHTML = `Уровней пройдено: ${level}`
   modal.classList.remove('hidden');
@@ -158,16 +171,18 @@ window.addEventListener('keydown', (event) => {
     event.preventDefault();
   }
 
-  switch (event.key) {
-    case 'ArrowUp': movePlayer(0, -1); break;
-    case 'w': movePlayer(0, -1); break;
-    case 'ArrowDown': movePlayer(0, 1); break;
-    case 's': movePlayer(0, 1); break;
-    case 'ArrowLeft': movePlayer(-1, 0); break;
-    case 'a': movePlayer(-1, 0); break;
-    case 'ArrowRight': movePlayer(1, 0); break;
-    case 'd': movePlayer(1, 0); break;
-    case ' ': movePlayer(0, 0); break;
+  if (!isGameOver) {
+    switch (event.key) {
+      case 'ArrowUp': movePlayer(0, -1); break;
+      case 'w': movePlayer(0, -1); break;
+      case 'ArrowDown': movePlayer(0, 1); break;
+      case 's': movePlayer(0, 1); break;
+      case 'ArrowLeft': movePlayer(-1, 0); break;
+      case 'a': movePlayer(-1, 0); break;
+      case 'ArrowRight': movePlayer(1, 0); break;
+      case 'd': movePlayer(1, 0); break;
+      case ' ': movePlayer(0, 0); break;
+    }
   }
 });
 

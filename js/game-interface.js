@@ -42,7 +42,7 @@ export function renderGame(grid, player, score, level, health, start) {
   grid.units.forEach(unit => {
     if (unit.div === null) {
       unit.div = document.createElement('div');
-      unit.div.className = 'unit enemy';
+      unit.div.className = 'unit enemy ' + unit.type;
       unit.div.style.width = `${cellSize}px`;
       unit.div.style.height = `${cellSize}px`;
       unit.div.style.transition = 'transform 0.2s ease';

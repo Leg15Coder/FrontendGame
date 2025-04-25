@@ -59,7 +59,7 @@ export function generateMap(level) {
       y = Math.floor(Math.random() * height);
     } while (map[y][x].type !== 'empty');
 
-    units.push({ x: x, y: y, type: 'enemy', behavior: chooseEnemyType(level), id: ids++, div: null });
+    units.push({ x: x, y: y, type: 'enemy', behavior: chooseEnemyType(level), id: ids++, div: null, cooldown: 0 });
   }
 
   return {

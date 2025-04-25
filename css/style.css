@@ -96,8 +96,14 @@ body {
 }
 
 #info {
+  position: sticky;
+  display: block;
   margin-bottom: 1em;
   font-size: 20px;
+  text-align: center;
+  top: 0;
+  padding: 0.75rem 1.5rem;
+  z-index: 1000;
 }
 
 #game {
@@ -125,6 +131,7 @@ body {
 /* Клетки */
 
 .cell {
+  background-size: cover;
   box-sizing: border-box;
   border: 1px solid #444;
   background-color: #111;
@@ -159,18 +166,20 @@ body {
 }
 
 .unit {
+  background-size: cover;
   position: absolute;
-  transition: transform 0.2s ease;
+  transition: transform 0.25s ease;
   z-index: 10;
 }
 
 .player {
-  background-color: gold;
-  border: 1px solid white;
+  background-image: url('../img/player.png');
+  border: 1px solid mintcream;
 }
 
 .enemy {
   background-color: cyan;
+  border: 1px solid darkred;
 }
 
 header {
@@ -241,8 +250,8 @@ main {
 
 #section-play {
   flex: 1;
-  overflow: auto;
   text-align: center;
+  position: relative;
 }
 
 .hidden {
