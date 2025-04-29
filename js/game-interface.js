@@ -42,7 +42,7 @@ export function renderGame(grid, player, score, level, health, start) {
   grid.units.forEach(unit => {
     if (unit.div === null) {
       unit.div = document.createElement('div');
-      unit.div.className = 'unit enemy ' + unit.type;
+      unit.div.className = 'unit enemy ' + unit.behavior;
       unit.div.style.width = `${cellSize}px`;
       unit.div.style.height = `${cellSize}px`;
       unit.div.style.transition = 'transform 0.2s ease';
@@ -54,6 +54,13 @@ export function renderGame(grid, player, score, level, health, start) {
 
   const info = document.getElementById('info');
   info.innerText = `Уровень: ${level} | Очки: ${score} | Здоровье: ${health}`;
+
+  const bar = document.getElementById('reveal-bar');
+  const text = document.getElementById('reveal-text');
+  bar.style.background = `background: linear-gradient(to right, #00ff00, #ffff00, #ff0000);`
+  bar.style.width = `${Math.floor(player.detectedRate)}%`;
+  let detectedRate = player.detectedRate >= 100 ? 100 : Math.floor(player.detectedRate);
+  text.textContent = `Вас раскрыли на ${detectedRate}%`;
 
   centerCameraOnPlayer(player);
 }

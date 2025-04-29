@@ -10,24 +10,15 @@ let touchStartY = null;
 let level = 1;
 let score = 0;
 let health = 20;
-let player = { x: 1, y: 1 };
+let player = { x: 1, y: 1, detectedRate: 0 };
 let grid;
 let timer = 0;
 let isGameOver = false;
 
-function findStart(map) {
-  for (let y = 0; y < map.length; y++) {
-    for (let x = 0; x < map[0].length; x++) {
-      if (map[y][x].type === 'start') return { x, y };
-    }
-  }
-  return { x: 1, y: 1 };
-}
-
 function startLevel() {
   timer = 0;
   grid = generateMap(level);
-  player = findStart(grid.map);
+  player = { x: 1, y: 1, detectedRate: (player.detectedRate + 1) / 2 };
   renderGame(grid, player, score, level, health, true);
 }
 
@@ -83,7 +74,9 @@ function movePlayer(dx, dy) {
 function moveEnemies() {
   const newUnits = [];
   for (let enemy of grid.units) {
-    let { x, y, type, behavior, id, div, cooldown } = enemy;
+    if (enemy.health <= 0) continue;
+
+    let { x, y, type, behavior, id, div, cooldown, enemyHealth } = enemy;
     let dx, dy;
 
     if (cooldown <= 0) {
@@ -103,7 +96,12 @@ function moveEnemies() {
       grid.map[newY][newX].type !== 'wall' &&
       grid.map[newY][newX].type !== 'exit'
     ) {
-      newUnits.push({ x: newX, y: newY, type, behavior, id, div, cooldown });
+      if (grid.map[newY][newX].type === 'fire') {
+        enemyHealth -= 2;
+        if (enemy.health <= 0) continue;
+      }
+
+      newUnits.push({ x: newX, y: newY, type, behavior, id, div, cooldown, enemyHealth });
     } else {
       enemy.cooldown = cooldown;
       newUnits.push(enemy);
@@ -125,6 +123,7 @@ function resetGame() {
   health = 20;
   level = 1;
   isGameOver = false;
+  player.detectedRate = 0;
   startLevel();
 }
 

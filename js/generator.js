@@ -22,15 +22,15 @@ export function generateMap(level) {
     for (let y = 0; y < height; y++) {
       const row = [];
       for (let x = 0; x < width; x++) {
-        if (Math.random() < Math.random() / 3) {
+        if (Math.random() < Math.random() / 2.2719281928) {
           row.push({ type: 'wall' });
-        } else if (level > 5 && Math.random() < Math.random() / 25) {
+        } else if (level > 9 && Math.random() < Math.random() / 32) {
           row.push({ type: 'portal' });
           portals.push({ x: x, y: y })
-        } else if (level > 3 && Math.random() < Math.random() / 50) {
+        } else if (level > 5 && Math.random() < Math.random() / 48) {
           row.push({ type: 'heal' });
           baths.push({ x: x, y: y, type: 'heal' })
-        } else if (level > 7 && Math.random() < Math.random() / 50) {
+        } else if (level > 12 && Math.random() < Math.random() / 64) {
           row.push({ type: 'scoreUp' });
           baths.push({ x: x, y: y, type: 'scoreUp' })
         } else {
@@ -59,7 +59,7 @@ export function generateMap(level) {
       y = Math.floor(Math.random() * height);
     } while (map[y][x].type !== 'empty');
 
-    units.push({ x: x, y: y, type: 'enemy', behavior: chooseEnemyType(level), id: ids++, div: null, cooldown: 0 });
+    units.push({ x: x, y: y, type: 'enemy', behavior: chooseEnemyType(level), id: ids++, div: null, cooldown: 0, health: 10 });
   }
 
   return {
