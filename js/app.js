@@ -27,6 +27,11 @@ function movePlayer(dx, dy) {
   let newY = player.y + dy;
   timer++;
 
+  if (timer > level * 100) {
+    player.detectedRate += 0.1;
+    player.detectedRate *= 1.01;
+  }
+
   if (newY < 0 || newY >= grid.map.length || newX < 0 || newX >= grid.map[0].length) return;
   let nextCell = grid.map[newY][newX];
 
@@ -212,7 +217,7 @@ window.showRecords = async function () {
 };
 
 window.navigate = function (section) {
-  const sections = ['about', 'play', 'stats'];
+  const sections = ['about', 'play', 'stats', 'settings'];
   sections.forEach(name => {
     document.getElementById(`section-${name}`).classList.add('hidden');
     document.getElementById(`section-${name}`).classList.remove('active');
@@ -231,13 +236,19 @@ document.addEventListener('DOMContentLoaded', () => {
   const sections = {
     about: document.getElementById('section-about'),
     play: document.getElementById('section-play'),
-    stats: document.getElementById('section-stats')
+    stats: document.getElementById('section-stats'),
+    settings: document.getElementById('section-settings')
   };
+
+  const volumeSlider = document.getElementById('volume-slider');
+  const music = document.getElementById('bg-music');
+  const musicButton = document.getElementById('toggle-music');
 
   const buttons = {
     about: document.getElementById('btn-about'),
     play: document.getElementById('btn-play'),
-    stats: document.getElementById('btn-stats')
+    stats: document.getElementById('btn-stats'),
+    settings: document.getElementById('btn-settings')
   };
 
   function showSection(name) {
@@ -248,6 +259,27 @@ document.addEventListener('DOMContentLoaded', () => {
   buttons.about.addEventListener('click', () => navigate('about'));
   buttons.play.addEventListener('click', () => navigate('play'));
   buttons.stats.addEventListener('click', () => navigate('stats'));
+  buttons.settings.addEventListener('click', () => navigate('settings'));
+
+  musicButton.addEventListener('click', () => {
+    if (music.paused) {
+      music.play();
+      musicButton.textContent = '🎵 Музыка: Вкл';
+    } else {
+      music.pause();
+      musicButton.textContent = '🔇 Музыка: Выкл';
+    }
+  });
+
+  volumeSlider.addEventListener('input', () => {
+    music.volume = volumeSlider.value;
+  });
+
+  document.addEventListener('click', () => {
+    if (music.paused) {
+      music.play().catch(e => console.warn('Ошибка воспроизведения:', e));
+    }
+  }, { once: true });
 
   showSection('about');
 });

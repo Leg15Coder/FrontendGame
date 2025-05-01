@@ -1,13 +1,13 @@
 export function playEnemyBehavior(enemy, grid, timer, player) {
-  let dx, dy;
+  let dx, dy, dirs = [[1,0], [-1,0], [0,1], [0,-1]];
 
   switch (enemy.behavior) {
     case 'worm':
-      [dx, dy] = smartMove(enemy, player, grid);
+      [dx, dy] = chase(enemy, player, grid);
       break;
 
     case 'bug': {
-      const dirs = [[1,0], [-1,0], [0,1], [0,-1], [0, 0]];
+      dirs = [[1,0], [-1,0], [0,1], [0,-1], [0, 0]];
       [dx, dy] = dirs[Math.floor(Math.random() * dirs.length)];
       break;
     }
@@ -17,9 +17,13 @@ export function playEnemyBehavior(enemy, grid, timer, player) {
       if (dist === 0) {
         [dx, dy] = [0, 0];
       } else if (dist <= 5) {
-        [dx, dy] = smartMove(enemy, player, grid);
+        if (Math.random() > 0.5) {
+          [dx, dy] = smartMove(enemy, player, grid, dirs);
+        } else {
+          [dx, dy] = chase(enemy, player, grid);
+        }
       } else {
-        const dirs = [[1,0], [-1,0], [0,1], [0,-1], [0, 0]];
+        dirs = [[1,0], [-1,0], [0,1], [0,-1], [0, 0]];
         [dx, dy] = dirs[Math.floor(Math.random() * dirs.length)];
       }
 
@@ -34,12 +38,22 @@ export function playEnemyBehavior(enemy, grid, timer, player) {
       if (dist === 0) player.detectedRate += 8;
       else if (dist <= 4) player.detectedRate += 1;
 
+      const target = { ...player };
+
       if (dist < 3) {
-        [dx, dy] = smartMove(enemy, { x: enemy.x - player.x, y: enemy.y - player.y, detectedRate: player.detectedRate}, grid);
+        const dx = enemy.x - player.x;
+        const dy = enemy.y - player.y;
+        target.x = enemy.x + Math.sign(dx);
+        target.y = enemy.y + Math.sign(dy);
       } else if (dist > 4) {
-        [dx, dy] = smartMove(enemy, player, grid);
+        target.x = player.x;
+        target.y = player.y;
+      } else {
+        target.x = enemy.x;
+        target.y = enemy.y;
       }
 
+      [dx, dy] = smartMove(enemy, target, grid, dirs);
       break;
     }
 
@@ -50,7 +64,7 @@ export function playEnemyBehavior(enemy, grid, timer, player) {
         enemy.div.classList.remove('hidden');
       }
 
-      const dirs = [
+      dirs = [
         [1,0], [-1,0], [0,1], [0,-1],
         [1,1], [-1,-1], [1,-1], [-1,1], [0, 0]
       ];
@@ -61,7 +75,7 @@ export function playEnemyBehavior(enemy, grid, timer, player) {
   }
 
   if (player.detectedRate >= 100.0) {
-    return smartMove(enemy, player, grid)
+    return smartMove(enemy, player, grid, dirs)
   }
 
   return [dx, dy];
@@ -76,15 +90,59 @@ function canMove(pos, grid) {
   return grid.map[y] && grid.map[y][x] && grid.map[y][x].type !== 'wall';
 }
 
-function smartMove(enemy, player, grid) {
-  const dirs = [
-    [1,0], [-1,0], [0,1], [0,-1], [0, 0]
-  ];
-  let res = dirs
-    .map(([dx, dy]) => [enemy.x + dx, enemy.y + dy, distance({ x: enemy.x + dx, y: enemy.y + dy }, player)])
-    .filter((e) => canMove(e, grid))
-    .sort((a, b) => a[2] - b[2])
-    .map(([x, y, dist]) => [x - enemy.x, y - enemy.y]);
-  if (res) return res[0];
-  else return [0, 0];
+function smartMove(enemy, player, grid, directions) {
+  const openSet = [{ x: enemy.x, y: enemy.y, g: 0, h: distance(enemy, player), parent: null }];
+  const closedSet = new Set();
+  const key = (x, y) => `${x},${y}`;
+
+  while (openSet.length > 0) {
+    openSet.sort((a, b) => (a.g + a.h) - (b.g + b.h));
+    const current = openSet.shift();
+    closedSet.add(key(current.x, current.y));
+
+    if (current.x === player.x && current.y === player.y) {
+      let step = current;
+      while (step.parent && step.parent.parent) step = step.parent;
+      return [step.x - enemy.x, step.y - enemy.y];
+    }
+
+    for (const [dx, dy] of directions) {
+      const nx = current.x + dx, ny = current.y + dy;
+      if (!canMove([nx, ny], grid) || closedSet.has(key(nx, ny))) continue;
+
+      const g = current.g + 1;
+      const h = distance({ x: nx, y: ny }, player);
+      const existing = openSet.find(n => n.x === nx && n.y === ny);
+
+      if (!existing || g < existing.g) {
+        if (existing) {
+          existing.g = g;
+          existing.parent = current;
+        } else {
+          openSet.push({ x: nx, y: ny, g: g, h: h, parent: current });
+        }
+      }
+    }
+  }
+
+  return [0, 0];
 }
+
+function chase(enemy, player, grid) {
+  const dirs = [[0, 0], [1, 0], [-1, 0], [0, 1], [0, -1]];
+  const options = dirs
+    .map(([mx, my]) => {
+      const nx = enemy.x + mx;
+      const ny = enemy.y + my;
+      if (nx < 0 || ny < 0 || nx >= grid.map[0].length || ny >= grid.map.length || grid.map[ny][nx].type === 'wall') return null;
+      return { mx, my, dist: distance({ x: nx, y: ny }, player) };
+    })
+    .filter(Boolean)
+    .sort((a, b) => a.dist - b.dist);
+
+  if (!options) return [0, 0];
+
+  return [options[0].mx, options[0].my];
+}
+
+
