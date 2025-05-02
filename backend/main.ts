@@ -23,7 +23,7 @@ serve(async (req) => {
       }
     }
 
-    const id = `${Date.now()}-${crypto.randomUUID()}`;
+    const id = `${Date.now()}`;
     await kv.set(["records", id], body);
 
     return new Response("OK", {
