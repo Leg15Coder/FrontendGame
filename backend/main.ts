@@ -8,8 +8,24 @@ serve(async (req) => {
 
   if (req.method === "POST" && url.pathname === "/api/record") {
     const body = await req.json();
+    const { name, score, level } = body;
+
+    for await (const entry of kv.list({ prefix: ["records"] })) {
+      const record = entry.value;
+      if (record.name === name && record.score === score && record.level === level) {
+        return new Response("Duplicate", {
+          status: 409,
+          headers: {
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "POST, OPTIONS",
+          }
+        });
+      }
+    }
+
     const id = `${Date.now()}-${crypto.randomUUID()}`;
     await kv.set(["records", id], body);
+
     return new Response("OK", {
       status: 201,
       headers: {
@@ -18,6 +34,7 @@ serve(async (req) => {
       }
     });
   }
+
 
   if (req.method === "GET" && url.pathname === "/api/records") {
     const records: any[] = [];
@@ -32,6 +49,28 @@ serve(async (req) => {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",  // Разрешить все домены
         "Access-Control-Allow-Methods": "GET, POST, OPTIONS",  // Разрешенные методы
+      }
+    });
+  }
+
+  if (req.method === "DELETE" && url.pathname === "/api/records") {
+    const auth = req.headers.get("Authorization");
+
+    if (auth !== "secret-token") {
+      return new Response("Unauthorized", { status: 401 });
+    }
+
+    let deleted = 0;
+    for await (const entry of kv.list({ prefix: ["records"] })) {
+      await kv.delete(entry.key);
+      deleted++;
+    }
+
+    return new Response(`Deleted ${deleted} records.`, {
+      status: 200,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "DELETE, OPTIONS",
       }
     });
   }
