@@ -13,7 +13,7 @@ serve(async (req) => {
     for await (const entry of kv.list({ prefix: ["records"] })) {
       const record = entry.value;
       if (record.name === name && record.score === score && record.level === level) {
-        return new Response("Duplicate", {
+        return new Response("Дублирующие записи", {
           status: 409,
           headers: {
             "Access-Control-Allow-Origin": "*",
@@ -24,7 +24,7 @@ serve(async (req) => {
     }
 
     const id = `${Date.now()}`;
-    await kv.set(["records", id], body);
+    await kv.set(["records", name, score, level], body);
 
     return new Response("OK", {
       status: 201,
@@ -57,7 +57,7 @@ serve(async (req) => {
     const auth = req.headers.get("Authorization");
 
     if (auth !== "secret-token") {
-      return new Response("Unauthorized", { status: 401 });
+      return new Response("Не авторизован", { status: 401 });
     }
 
     let deleted = 0;
@@ -66,7 +66,7 @@ serve(async (req) => {
       deleted++;
     }
 
-    return new Response(`Deleted ${deleted} records.`, {
+    return new Response(`Удалено ${deleted} Записей.`, {
       status: 200,
       headers: {
         "Access-Control-Allow-Origin": "*",
