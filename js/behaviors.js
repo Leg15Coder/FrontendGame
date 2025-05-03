@@ -87,7 +87,7 @@ function distance(a, b) {
 
 function canMove(pos, grid) {
   let [x, y] = pos;
-  return grid.map[y] && grid.map[y][x] && grid.map[y][x].type !== 'wall';
+  return grid.map[y] && grid.map[y][x] && grid.map[y][x].type !== 'wall' && grid.map[y][x].type !== 'exit';
 }
 
 function smartMove(enemy, player, grid, directions) {
@@ -134,7 +134,7 @@ function chase(enemy, player, grid) {
     .map(([mx, my]) => {
       const nx = enemy.x + mx;
       const ny = enemy.y + my;
-      if (nx < 0 || ny < 0 || nx >= grid.map[0].length || ny >= grid.map.length || grid.map[ny][nx].type === 'wall') return null;
+      if (!canMove([nx, ny], grid)) return null;
       return { mx, my, dist: distance({ x: nx, y: ny }, player) };
     })
     .filter(Boolean)

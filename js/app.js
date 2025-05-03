@@ -27,7 +27,7 @@ function movePlayer(dx, dy) {
   let newY = player.y + dy;
   timer++;
 
-  if (timer > level * 100) {
+  if (timer > level * 64) {
     player.detectedRate += 0.1;
     player.detectedRate *= 1.01;
   }
@@ -46,8 +46,10 @@ function movePlayer(dx, dy) {
   player.x = newX;
   player.y = newY;
 
-  if (nextCell.type === 'fire') health -= 2;
-  else if (nextCell.type === 'heal') {
+  if (nextCell.type === 'fire') {
+    health -= 5;
+    grid.map[newY][newX].type = 'empty';
+  } else if (nextCell.type === 'heal') {
     health += 5;
     grid.map[newY][newX].type = 'empty';
   } else if (nextCell.type === 'scoreUp') {
@@ -102,8 +104,8 @@ function moveEnemies() {
       grid.map[newY][newX].type !== 'exit'
     ) {
       if (grid.map[newY][newX].type === 'fire') {
-        enemyHealth -= 2;
-        if (enemy.health <= 0) continue;
+        enemyHealth -= 4;
+        if (enemyHealth <= 0 || enemy.health <= 0) continue;
       }
 
       newUnits.push({ x: newX, y: newY, type, behavior, id, div, cooldown, enemyHealth });
@@ -193,7 +195,15 @@ window.addEventListener('keydown', (event) => {
 startLevel();
 
 window.showRecords = async function () {
-  const res = await fetch(`${API_URL}/api/records`);
+  const userName = document.getElementById("search-user").value;
+  const limit = document.getElementById("search-limit").value;
+  let url = `${API_URL}/api/records`;
+
+  if (limit) url += `?limit=${limit}`;
+  if (userName && limit) url += `&userId=${userName}`;
+  else if (userName) url += `?userId=${userName}`;
+
+  const res = await fetch(url);
   const records = await res.json();
 
   const table = `
@@ -281,6 +291,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }, { once: true });
 
+  document.getElementById("search-btn").onclick = window.showRecords;
+
   showSection('about');
 });
 
@@ -308,4 +320,3 @@ document.addEventListener("touchend", e => {
   touchStartX = null;
   touchStartY = null;
 }, false);
-

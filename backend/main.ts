@@ -37,10 +37,15 @@ serve(async (req) => {
 
 
   if (req.method === "GET" && url.pathname === "/api/records") {
+    const userName = url.searchParams.get("userName");
+    const limit = Number(url.searchParams.get("limit") ?? 100);
     const records: any[] = [];
 
     for await (const entry of kv.list({ prefix: ["records"] })) {
+      if (userName && entry.value.name !== userName) continue;
+
       records.push(entry.value);
+      if (records.length >= limit) break;
     }
 
     records.sort((a, b) => b.score - a.score || new Date(a.time) - new Date(b.time));
@@ -66,7 +71,7 @@ serve(async (req) => {
       deleted++;
     }
 
-    return new Response(`Удалено ${deleted} Записей.`, {
+    return new Response(`Удалено ${deleted} Записей`, {
       status: 200,
       headers: {
         "Access-Control-Allow-Origin": "*",
