@@ -3,7 +3,7 @@ const minCellSize = 12;
 
 let cellSize;
 
-export function renderGame(grid, player, score, level, health, start) {
+export function renderGame(grid, player, score, level, start) {
   const container = document.getElementById('game');
 
   const width = grid.map[0].length;
@@ -53,7 +53,7 @@ export function renderGame(grid, player, score, level, health, start) {
   });
 
   const info = document.getElementById('info');
-  info.innerText = `Уровень: ${level} | Очки: ${score} | Здоровье: ${health}`;
+  info.innerText = `${level} Lvl | ${score} 💰 | ${player.health} ❤️`;
 
   const bar = document.getElementById('reveal-bar');
   const text = document.getElementById('reveal-text');
@@ -73,4 +73,3 @@ function centerCameraOnPlayer(player) {
     });
   }
 }
-

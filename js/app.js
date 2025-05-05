@@ -1,4 +1,4 @@
-import { generateMap } from './generator.js';
+import { generateMap, spawnEnemy } from './generator.js';
 import { renderGame } from './game-interface.js';
 import { playEnemyBehavior } from './behaviors.js'
 
@@ -9,8 +9,7 @@ let touchStartY = null;
 
 let level = 1;
 let score = 0;
-let health = 20;
-let player = { x: 1, y: 1, detectedRate: 0 };
+let player = { x: 1, y: 1, detectedRate: 0, health: 20 };
 let grid;
 let timer = 0;
 let isGameOver = false;
@@ -18,8 +17,8 @@ let isGameOver = false;
 function startLevel() {
   timer = 0;
   grid = generateMap(level);
-  player = { x: 1, y: 1, detectedRate: (player.detectedRate + 1) / 2 };
-  renderGame(grid, player, score, level, health, true);
+  player = { x: 1, y: 1, detectedRate: (player.detectedRate + 1) / 2, health: player.health };
+  renderGame(grid, player, score, level, true);
 }
 
 function movePlayer(dx, dy) {
@@ -47,10 +46,10 @@ function movePlayer(dx, dy) {
   player.y = newY;
 
   if (nextCell.type === 'fire') {
-    health -= 5;
+    player.health -= 5;
     grid.map[newY][newX].type = 'empty';
   } else if (nextCell.type === 'heal') {
-    health += 5;
+    player.health += 5;
     grid.map[newY][newX].type = 'empty';
   } else if (nextCell.type === 'scoreUp') {
     score += 50;
@@ -70,28 +69,37 @@ function movePlayer(dx, dy) {
 
   moveEnemies();
 
-  if (health <= 0) {
-    renderGame(grid, player, score, level, health, false);
+  if (player.health <= 0) {
+    renderGame(grid, player, score, level, false);
     return gameOver();
   }
 
-  renderGame(grid, player, score, level, health, false);
+  renderGame(grid, player, score, level, false);
 }
 
 function moveEnemies() {
   const newUnits = [];
-  for (let enemy of grid.units) {
-    if (enemy.health <= 0) continue;
 
-    let { x, y, type, behavior, id, div, cooldown, enemyHealth } = enemy;
+  if (grid.units.length === 0) {
+    spawnEnemy(player, grid);
+  }
+
+  for (let enemy of grid.units) {
+    if (enemy.health <= 0) {
+      const container = document.getElementById('game');
+      container.removeChild(enemy.div);
+      continue;
+    }
+
+    let x = enemy.x, y = enemy.y, enemyHealth = enemy.health;
     let dx, dy;
 
-    if (cooldown <= 0) {
+    if (enemy.cooldown <= 0) {
       [dx, dy] = playEnemyBehavior(enemy, grid, timer, player)
-      cooldown = 0;
+      enemy.cooldown = 0;
     } else {
       [dx, dy] = [0, 0];
-      cooldown--;
+      enemy.cooldown--;
     }
 
     const newX = x + dx;
@@ -105,14 +113,26 @@ function moveEnemies() {
     ) {
       if (grid.map[newY][newX].type === 'fire') {
         enemyHealth -= 4;
-        if (enemyHealth <= 0 || enemy.health <= 0) continue;
+        if (enemyHealth <= 0 || enemy.health <= 0) {
+          const container = document.getElementById('game');
+          container.removeChild(enemy.div);
+          continue;
+        }
       }
-
-      newUnits.push({ x: newX, y: newY, type, behavior, id, div, cooldown, enemyHealth });
+      enemy.x = newX;
+      enemy.y = newY;
+      enemy.health = enemyHealth;
     } else {
-      enemy.cooldown = cooldown;
-      newUnits.push(enemy);
+      if (grid.map[enemy.y][enemy.x].type === 'fire') {
+        enemyHealth -= 4;
+        if (enemyHealth <= 0 || enemy.health <= 0) {
+          const container = document.getElementById('game');
+          container.removeChild(enemy.div);
+          continue;
+        }
+      }
     }
+    newUnits.push(enemy);
   }
 
   grid.units = newUnits;
@@ -120,14 +140,14 @@ function moveEnemies() {
   for (let enemy of grid.units) {
     if (enemy.type === 'enemy' && enemy.x === player.x && enemy.y === player.y) {
       enemy.cooldown++;
-      health -= 20;
+      player.health -= 20;
     }
   }
 }
 
 function resetGame() {
   score = 0;
-  health = 20;
+  player.health = 20;
   level = 1;
   isGameOver = false;
   player.detectedRate = 0;
@@ -178,15 +198,19 @@ window.addEventListener('keydown', (event) => {
   }
 
   if (!isGameOver) {
-    switch (event.key) {
-      case 'ArrowUp': movePlayer(0, -1); break;
+    switch (event.key.toLowerCase()) {
+      case 'arrowup': movePlayer(0, -1); break;
       case 'w': movePlayer(0, -1); break;
-      case 'ArrowDown': movePlayer(0, 1); break;
+      case 'ц': movePlayer(0, -1); break;
+      case 'arrowdown': movePlayer(0, 1); break;
       case 's': movePlayer(0, 1); break;
-      case 'ArrowLeft': movePlayer(-1, 0); break;
+      case 'ы': movePlayer(0, 1); break;
+      case 'arrowleft': movePlayer(-1, 0); break;
       case 'a': movePlayer(-1, 0); break;
-      case 'ArrowRight': movePlayer(1, 0); break;
+      case 'ф': movePlayer(-1, 0); break;
+      case 'arrowright': movePlayer(1, 0); break;
       case 'd': movePlayer(1, 0); break;
+      case 'в': movePlayer(1, 0); break;
       case ' ': movePlayer(0, 0); break;
     }
   }
@@ -200,8 +224,8 @@ window.showRecords = async function () {
   let url = `${API_URL}/api/records`;
 
   if (limit) url += `?limit=${limit}`;
-  if (userName && limit) url += `&userId=${userName}`;
-  else if (userName) url += `?userId=${userName}`;
+  if (userName && limit) url += `&userName=${userName}`;
+  else if (userName) url += `?userName=${userName}`;
 
   const res = await fetch(url);
   const records = await res.json();

@@ -47,6 +47,11 @@ export function generateMap(level) {
       map.push(row);
     }
 
+    if (portals.length === 1) {
+      let portal = portals.at(0);
+      map[portal.y][portal.x] = { type: 'empty' };
+    }
+
     map[1][1] = { type: 'start' };
     map[height - 2][width - 2] = { type: 'exit' };
 
@@ -60,7 +65,7 @@ export function generateMap(level) {
       y = Math.floor(Math.random() * height);
     } while (map[y][x].type !== 'empty');
 
-    units.push({ x: x, y: y, type: 'enemy', behavior: chooseEnemyType(level), id: ids++, div: null, cooldown: 0, health: 10 });
+    units.push({ x: x, y: y, type: 'enemy', behavior: chooseEnemyType(level), id: ids++, div: null, cooldown: 0, health: 16 });
   }
 
   return {
@@ -68,6 +73,16 @@ export function generateMap(level) {
     units: units,
     portals: portals
   };
+}
+
+export function spawnEnemy(player, grid) {
+  let x, y;
+  do {
+    x = Math.floor(Math.random() * grid.map[0].length);
+    y = Math.floor(Math.random() * grid.map.length);
+  } while (grid.map[y][x].type === 'wall' || grid.map[y][x].type === 'exit' || (x === player.x && y === player.y));
+
+  grid.units.push({ x: x, y: y, type: 'enemy', behavior: chooseEnemyType(1), id: Date.now() + Math.random(), div: null, cooldown: 0, health: 16 });
 }
 
 function checkMap(map, startX, startY) {

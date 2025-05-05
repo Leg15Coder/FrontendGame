@@ -144,5 +144,3 @@ function chase(enemy, player, grid) {
 
   return [options[0].mx, options[0].my];
 }
-
-

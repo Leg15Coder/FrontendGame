@@ -23,7 +23,6 @@ serve(async (req) => {
       }
     }
 
-    const id = `${Date.now()}`;
     await kv.set(["records", name, score, level], body);
 
     return new Response("OK", {
@@ -35,7 +34,6 @@ serve(async (req) => {
     });
   }
 
-
   if (req.method === "GET" && url.pathname === "/api/records") {
     const userName = url.searchParams.get("userName");
     const limit = Number(url.searchParams.get("limit") ?? 100);
@@ -43,13 +41,11 @@ serve(async (req) => {
 
     for await (const entry of kv.list({ prefix: ["records"] })) {
       if (userName && entry.value.name !== userName) continue;
-
       records.push(entry.value);
-      if (records.length >= limit) break;
     }
 
     records.sort((a, b) => b.score - a.score || new Date(a.time) - new Date(b.time));
-    return new Response(JSON.stringify(records.slice(0, 100)), {
+    return new Response(JSON.stringify(records.slice(0, limit)), {
       headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",  // Разрешить все домены
