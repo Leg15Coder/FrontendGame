@@ -82,6 +82,7 @@ function moveEnemies() {
 
   if (grid.units.length === 0) {
     spawnEnemy(player, grid);
+    renderGame(grid, player, score, level, false);
   }
 
   for (let enemy of grid.units) {
