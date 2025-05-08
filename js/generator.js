@@ -2,11 +2,7 @@ let prevWidth = 16;
 let prevHeight = 10;
 const minWidth = 8, minHeight = 8;
 const maxWidth = 64, maxHeight = 256;
-const enemyTypes = ['worm', 'bug', 'zombie', 'spy', 'backdoor'];
-
-function chooseEnemyType(level) {
-  return enemyTypes[Math.floor(Math.random() * enemyTypes.length)];
-}
+const enemyTypes = ['worm', 'bug', 'zombie', 'spy', 'backdoor', 'trojan'];
 
 export function generateMap(level) {
   if (level === 1) {
@@ -18,31 +14,15 @@ export function generateMap(level) {
   prevWidth = Math.max(minWidth, Math.min(maxWidth, prevWidth + delta()));
   prevHeight = Math.max(minHeight, Math.min(maxHeight, prevHeight + delta()));
 
-  let map, portals, baths, units = [], width = prevWidth, height = prevHeight, ids = 0;
+  let map, portals, units = [], width = prevWidth, height = prevHeight;
 
   while (true) {
     map = [];
     portals = [];
-    baths = [];
     for (let y = 0; y < height; y++) {
       const row = [];
       for (let x = 0; x < width; x++) {
-        if (Math.random() < Math.random() / 2.2719281928) {
-          row.push({ type: 'wall' });
-        } else if (level > 7 && Math.random() < Math.random() / 32) {
-          row.push({ type: 'portal' });
-          portals.push({ x: x, y: y })
-        } else if (level > 3 && Math.random() < Math.random() / 48) {
-          row.push({ type: 'heal' });
-          baths.push({ x: x, y: y, type: 'heal' })
-        } else if (level > 9 && Math.random() < Math.random() / 64) {
-          row.push({ type: 'scoreUp' });
-          baths.push({ x: x, y: y, type: 'scoreUp' })
-        } else if (level > 1 && Math.random() < Math.random() / 128) {
-          row.push({ type: 'fire' });
-        } else {
-          row.push({ type: 'empty' });
-        }
+        chooseCellType(x, y, level, portals, row);
       }
       map.push(row);
     }
@@ -50,6 +30,7 @@ export function generateMap(level) {
     if (portals.length === 1) {
       let portal = portals.at(0);
       map[portal.y][portal.x] = { type: 'empty' };
+      portals = [];
     }
 
     map[1][1] = { type: 'start' };
@@ -58,31 +39,27 @@ export function generateMap(level) {
     if (checkMap(map, 1, 1)) break;
   }
 
-  for (let i = 0; i < Math.floor(Math.random() * level * 1.0001) + 1; i++) {
-    let x, y;
-    do {
-      x = Math.floor(Math.random() * width);
-      y = Math.floor(Math.random() * height);
-    } while (map[y][x].type !== 'empty');
-
-    units.push({ x: x, y: y, type: 'enemy', behavior: chooseEnemyType(level), id: ids++, div: null, cooldown: 0, health: 16 });
-  }
-
-  return {
+  let grid = {
     map: map,
     units: units,
     portals: portals
   };
+
+  for (let i = 0; i < Math.random() * level * 1.0001 + 1; i++) {
+    spawnEnemy({ x: 1, y: 1}, grid, level);
+  }
+
+  return grid;
 }
 
-export function spawnEnemy(player, grid) {
+export function spawnEnemy(player, grid, level) {
   let x, y;
   do {
     x = Math.floor(Math.random() * grid.map[0].length);
     y = Math.floor(Math.random() * grid.map.length);
   } while (grid.map[y][x].type === 'wall' || grid.map[y][x].type === 'exit' || (x === player.x && y === player.y));
 
-  grid.units.push({ x: x, y: y, type: 'enemy', behavior: chooseEnemyType(1), id: Date.now() + Math.random(), div: null, cooldown: 0, health: 16 });
+  grid.units.push(chooseEnemyType(x, y, level));
 }
 
 function checkMap(map, startX, startY) {
@@ -91,9 +68,7 @@ function checkMap(map, startX, startY) {
   const visited = Array.from({ length: height }, () => Array(width).fill(false));
   const queue = [[startX, startY]];
   visited[startY][startX] = true;
-
   const directions = [[0,1],[1,0],[-1,0],[0,-1]];
-  let reachable = 1;
 
   while (queue.length) {
     const [x, y] = queue.shift();
@@ -119,4 +94,40 @@ function checkMap(map, startX, startY) {
   }
 
   return true;
+}
+
+function chooseEnemyType(x, y, level) {
+  return {
+    x: x,
+    y: y,
+    type: 'enemy',
+    behavior: enemyTypes[Math.floor(Math.random() * enemyTypes.length)],
+    id: Date.now() + Math.random(),
+    div: null,
+    cooldown: 0,
+    health: 16
+  };
+}
+
+function accessChance(chanceConst) {
+  return Math.random() < Math.random() / chanceConst;
+}
+
+function chooseCellType(x, y, level, portals, row) {
+  const WALL_SPAWN = 2.2719281928, PORTAL_SPAWN = 32, HEAL_SPAWN = 48, SCOREUP_SPAWN = 64, FIRE_SPAWN = 128;
+
+  if (accessChance(WALL_SPAWN)) {
+    row.push({ type: 'wall' });
+  } else if (level > 7 && accessChance(PORTAL_SPAWN)) {
+    row.push({ type: 'portal' });
+    portals.push({ x: x, y: y })
+  } else if (level > 3 && accessChance(HEAL_SPAWN)) {
+    row.push({ type: 'heal' });
+  } else if (level > 9 && accessChance(SCOREUP_SPAWN)) {
+    row.push({ type: 'scoreUp' });
+  } else if (level > 1 && accessChance(FIRE_SPAWN)) {
+    row.push({ type: 'fire' });
+  } else {
+    row.push({ type: 'empty' });
+  }
 }

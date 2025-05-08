@@ -191,6 +191,25 @@ body {
   background-image: url('../img/bug.png');
 }
 
+.trojan.active {
+  background-image: url('../img/trojan.png');
+}
+
+.trojan.heal {
+  background-image: url('../img/heal.png');
+  border: none;
+}
+
+.trojan.score {
+  background-image: url('../img/scoreUp.png');
+  border: none;
+}
+
+.trojan.fire {
+  background-image: url('../img/fire.png');
+  border: none;
+}
+
 header {
   background-color: #1e1e1e;
   padding: 1rem;

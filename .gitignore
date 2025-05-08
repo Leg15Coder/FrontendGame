@@ -8,3 +8,5 @@ dist
 old
 .gitattributes
 .editorconfig
+*.env
+env

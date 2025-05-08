@@ -1,6 +1,9 @@
 import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 import { serveDir } from "https://deno.land/std@0.224.0/http/file_server.ts";
+import { load } from "https://deno.land/std@0.224.0/dotenv/mod.ts";
 
+const env = await load();
+const SECRET_TOKEN = env.SECRET_TOKEN;
 const kv = await Deno.openKv();
 
 serve(async (req) => {
@@ -9,6 +12,11 @@ serve(async (req) => {
   if (req.method === "POST" && url.pathname === "/api/record") {
     const body = await req.json();
     const { name, score, level } = body;
+    const auth = req.headers.get("Authorization");
+
+    if (auth !== SECRET_TOKEN) {
+      return new Response("Не авторизован", { status: 401 });
+    }
 
     for await (const entry of kv.list({ prefix: ["records"] })) {
       const record = entry.value;
@@ -57,7 +65,7 @@ serve(async (req) => {
   if (req.method === "DELETE" && url.pathname === "/api/records") {
     const auth = req.headers.get("Authorization");
 
-    if (auth !== "secret-token") {
+    if (auth !== SECRET_TOKEN) {
       return new Response("Не авторизован", { status: 401 });
     }
 

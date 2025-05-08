@@ -2,7 +2,7 @@ import { generateMap, spawnEnemy } from './generator.js';
 import { renderGame } from './game-interface.js';
 import { playEnemyBehavior } from './behaviors.js'
 
-const API_URL = "https://leg15coder-devdungeon.deno.dev";
+const API_URL = Deno.env.API_URL;
 
 let touchStartX = null;
 let touchStartY = null;
@@ -81,7 +81,7 @@ function moveEnemies() {
   const newUnits = [];
 
   if (grid.units.length === 0) {
-    spawnEnemy(player, grid);
+    spawnEnemy(player, grid, level);
     renderGame(grid, player, score, level, false);
   }
 
@@ -173,7 +173,8 @@ async function gameOver() {
         await fetch(`${API_URL}/api/record`, {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': Deno.env.SECRET_TOKEN
           },
           body: JSON.stringify(record)
         });

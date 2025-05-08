@@ -1,3 +1,9 @@
+const trojanSkinList = ['heal', 'score', 'fire'];
+
+export function chooseTrojanSkin() {
+  return trojanSkinList[Math.floor(Math.random() * trojanSkinList.length)];
+}
+
 export function playEnemyBehavior(enemy, grid, timer, player) {
   let dx, dy, dirs = [[1,0], [-1,0], [0,1], [0,-1]];
 
@@ -13,7 +19,7 @@ export function playEnemyBehavior(enemy, grid, timer, player) {
     }
 
     case 'zombie': {
-      const dist = distance(player, enemy);
+      const dist = manhatanDistance(player, enemy);
       if (dist === 0) {
         [dx, dy] = [0, 0];
       } else if (dist <= 5) {
@@ -34,7 +40,7 @@ export function playEnemyBehavior(enemy, grid, timer, player) {
     }
 
     case 'spy': {
-      const dist = distance(player, enemy);
+      const dist = manhatanDistance(player, enemy);
       if (dist === 0) player.detectedRate += 8;
       else if (dist <= 4) player.detectedRate += 1;
 
@@ -72,6 +78,30 @@ export function playEnemyBehavior(enemy, grid, timer, player) {
       [dx, dy] = dirs[Math.floor(Math.random() * dirs.length)];
       break;
     }
+
+    case 'trojan':
+      const dist = euclidDistance(player, enemy);
+      console.log(enemy.cooldown);
+
+      if (enemy.div.classList.contains('active') && player.detectedRate < 100) {
+        if (dist > 3) {
+          enemy.cooldown += 1;
+          enemy.div.classList.add(chooseTrojanSkin());
+          enemy.div.classList.remove('active');
+        } else {
+          [dx, dy] = chase(enemy, player, grid);
+        }
+      } else {
+        if (dist < 2) {
+          for (let skin of trojanSkinList) {
+            enemy.div.classList.remove(skin);
+          }
+          enemy.div.classList.add('active');
+        }
+        [dx, dy] = [0, 0];
+      }
+
+      break;
   }
 
   if (player.detectedRate >= 100.0) {
@@ -81,8 +111,12 @@ export function playEnemyBehavior(enemy, grid, timer, player) {
   return [dx, dy];
 }
 
-function distance(a, b) {
+function manhatanDistance(a, b) {
   return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
+}
+
+function euclidDistance(a, b) {
+  return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2));
 }
 
 function canMove(pos, grid) {
@@ -91,7 +125,7 @@ function canMove(pos, grid) {
 }
 
 function smartMove(enemy, player, grid, directions) {
-  const openSet = [{ x: enemy.x, y: enemy.y, g: 0, h: distance(enemy, player), parent: null }];
+  const openSet = [{ x: enemy.x, y: enemy.y, g: 0, h: manhatanDistance(enemy, player), parent: null }];
   const closedSet = new Set();
   const key = (x, y) => `${x},${y}`;
 
@@ -111,7 +145,7 @@ function smartMove(enemy, player, grid, directions) {
       if (!canMove([nx, ny], grid) || closedSet.has(key(nx, ny))) continue;
 
       const g = current.g + 1;
-      const h = distance({ x: nx, y: ny }, player);
+      const h = manhatanDistance({ x: nx, y: ny }, player);
       const existing = openSet.find(n => n.x === nx && n.y === ny);
 
       if (!existing || g < existing.g) {
@@ -135,7 +169,7 @@ function chase(enemy, player, grid) {
       const nx = enemy.x + mx;
       const ny = enemy.y + my;
       if (!canMove([nx, ny], grid)) return null;
-      return { mx, my, dist: distance({ x: nx, y: ny }, player) };
+      return { mx, my, dist: euclidDistance({ x: nx, y: ny }, player) };
     })
     .filter(Boolean)
     .sort((a, b) => a.dist - b.dist);
