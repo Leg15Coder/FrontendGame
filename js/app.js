@@ -2,8 +2,8 @@ import { generateMap, spawnEnemy } from './generator.js';
 import { renderGame } from './game-interface.js';
 import { playEnemyBehavior } from './behaviors.js'
 
-const API_URL = Deno.env.get("API_URL");
-const SECRET_TOKEN = Deno.env.get("SECRET_TOKEN");
+const API_URL = 'https://leg15coder-devdungeon.deno.dev'  // Deno.env.get("API_URL");
+const SECRET_TOKEN = 'Leg15FullSecretToken'  // Deno.env.get("SECRET_TOKEN");
 
 let touchStartX = null;
 let touchStartY = null;
