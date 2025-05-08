@@ -91,7 +91,7 @@ export function playEnemyBehavior(enemy, grid, timer, player) {
           [dx, dy] = chase(enemy, player, grid);
         }
       } else {
-        if (dist < 2) {
+        if (dist < 2 || player.detectedRate >= 100) {
           for (let skin of trojanSkinList) {
             enemy.div.classList.remove(skin);
           }

@@ -63,6 +63,7 @@ serve(async (req) => {
   }
 
   if (req.method === "DELETE" && url.pathname === "/api/records") {
+    const userName = url.searchParams.get("userName");
     const auth = req.headers.get("Authorization");
 
     if (auth !== SECRET_TOKEN) {
@@ -71,8 +72,10 @@ serve(async (req) => {
 
     let deleted = 0;
     for await (const entry of kv.list({ prefix: ["records"] })) {
-      await kv.delete(entry.key);
-      deleted++;
+      if (userName && userName === entry.key.name) {
+        await kv.delete(entry.key);
+        deleted++;
+      }
     }
 
     return new Response(`Удалено ${deleted} Записей`, {
