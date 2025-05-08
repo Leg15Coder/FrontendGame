@@ -1,10 +1,9 @@
 import { generateMap, spawnEnemy } from './generator.js';
 import { renderGame } from './game-interface.js';
 import { playEnemyBehavior } from './behaviors.js'
-import { load } from "https://deno.land/std/dotenv/mod.ts";
 
-const env = await load();
-const API_URL = env.API_URL;
+const API_URL = Deno.env.get("API_URL");
+const SECRET_TOKEN = Deno.env.get("SECRET_TOKEN");
 
 let touchStartX = null;
 let touchStartY = null;
@@ -176,7 +175,7 @@ async function gameOver() {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': env.SECRET_TOKEN
+            'Authorization': SECRET_TOKEN
           },
           body: JSON.stringify(record)
         });
