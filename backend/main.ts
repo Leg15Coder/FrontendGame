@@ -82,7 +82,7 @@ serve(async (req) => {
 
     let deleted = 0;
     for await (const entry of kv.list({ prefix: ["records"] })) {
-      if (userName && userName === entry.key.name) {
+      if (userName && userName === entry.value.name) {
         await kv.delete(entry.key);
         deleted++;
       }
