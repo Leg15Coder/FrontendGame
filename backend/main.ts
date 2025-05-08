@@ -63,7 +63,7 @@ serve(async (req) => {
   }
 
   if (req.method === "GET" && url.pathname === "/api/config") {
-    return new Response(JSON.stringify({'SECRET_TOKEN': SECRET_TOKEN, 'API_URL': env.API_URL}), {
+    return new Response(JSON.stringify({'SECRET_TOKEN': SECRET_TOKEN, 'API_URL': env.API_URL, 'summery': [SECRET_TOKEN, env.API_URL]}), {
       headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
