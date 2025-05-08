@@ -76,7 +76,7 @@ serve(async (req) => {
     const userName = url.searchParams.get("userName");
     const auth = req.headers.get("Authorization");
 
-    if (auth !== SECRET_TOKEN || SECRET_TOKEN !== null) {
+    if (auth !== SECRET_TOKEN && SECRET_TOKEN !== null) {
       return new Response("Не авторизован", { status: 401 });
     }
 
