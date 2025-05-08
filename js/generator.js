@@ -45,7 +45,7 @@ export function generateMap(level) {
     portals: portals
   };
 
-  for (let i = 0; i < Math.random() * level * 1.0001 + 1; i++) {
+  for (let i = 0; i < Math.random() * level * 1.001; i++) {
     spawnEnemy({ x: 1, y: 1}, grid, level);
   }
 
