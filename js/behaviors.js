@@ -81,7 +81,6 @@ export function playEnemyBehavior(enemy, grid, timer, player) {
 
     case 'trojan':
       const dist = euclidDistance(player, enemy);
-      console.log(enemy.cooldown);
 
       if (enemy.div.classList.contains('active') && player.detectedRate < 100) {
         if (dist > 3) {

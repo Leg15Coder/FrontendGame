@@ -14,9 +14,9 @@ serve(async (req) => {
     const { name, score, level } = body;
     const auth = req.headers.get("Authorization");
 
-    if (auth !== SECRET_TOKEN) {
-      return new Response("Не авторизован", { status: 401 });
-    }
+    // if (auth !== SECRET_TOKEN) {
+    //   return new Response("Не авторизован", { status: 401 });
+    // }
 
     for await (const entry of kv.list({ prefix: ["records"] })) {
       const record = entry.value;
