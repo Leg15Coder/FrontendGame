@@ -62,6 +62,16 @@ serve(async (req) => {
     });
   }
 
+  if (req.method === "GET" && url.pathname === "/api/config") {
+    return new Response(JSON.stringify({'SECRET_TOKEN': SECRET_TOKEN, 'API_URL': env.API_URL}), {
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+      }
+    });
+  }
+
   if (req.method === "DELETE" && url.pathname === "/api/records") {
     const userName = url.searchParams.get("userName");
     const auth = req.headers.get("Authorization");
