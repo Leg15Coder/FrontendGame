@@ -1,0 +1,35 @@
+#music-control {
+  text-align: center;
+  margin-top: 10px;
+}
+
+#toggle-music {
+  font-family: 'Press Start 2P', cursive;
+  font-size: 10px;
+  padding: 8px 12px;
+  background: #1e1e2f99;
+  color: #6c6ccc;
+  border: 2px solid #6c6ccc;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+#toggle-music:hover {
+  background: #2e2e4f99;
+}
+
+#volume-wrapper {
+  margin-top: 10px;
+  text-align: center;
+  font-family: 'Press Start 2P', cursive;
+  font-size: 10px;
+  color: #ffffff;
+}
+
+#volume-slider {
+  width: 200px;
+  margin-top: 15px;
+  background: #1e1e2f;
+  accent-color: #6c6ccc;
+}
