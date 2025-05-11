@@ -2,9 +2,11 @@ import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 import { serveDir } from "https://deno.land/std@0.224.0/http/file_server.ts";
 import { load } from "https://deno.land/std@0.224.0/dotenv/mod.ts";
 
-const env = await load();
-const SECRET_TOKEN = env.SECRET_TOKEN;
+const env = await load({ export: true });
+const SECRET_TOKEN = env.SECRET_TOKEN || Deno.env.get("SECRET_TOKEN");
 const kv = await Deno.openKv();
+
+console.log("Game raised, secret key=" + SECRET_TOKEN)
 
 serve(async (req) => {
   const url = new URL(req.url);
@@ -64,6 +66,11 @@ serve(async (req) => {
   }
 
   if (req.method === "GET" && url.pathname === "/api/config") {
+    const auth = req.headers.get("Authorization");
+    if (auth !== SECRET_TOKEN && SECRET_TOKEN !== null) {
+      return new Response("Не авторизован", { status: 401 });
+    }
+
     return new Response(JSON.stringify({'SECRET_TOKEN': SECRET_TOKEN, 'API_URL': env.API_URL, 'summery': [SECRET_TOKEN, env.API_URL]}), {
       headers: {
         "Content-Type": "application/json",
@@ -76,16 +83,18 @@ serve(async (req) => {
   if (req.method === "DELETE" && url.pathname === "/api/records") {
     const userName = url.searchParams.get("userName");
     const dataTime = url.searchParams.get("time");
+    const maxLength = Number(url.searchParams.get("maxLength") ?? 1000);
     const auth = req.headers.get("Authorization");
 
-    // if (auth !== SECRET_TOKEN && SECRET_TOKEN !== null) {
-    //   return new Response("Не авторизован", { status: 401 });
-    // }
+    if (auth !== SECRET_TOKEN && SECRET_TOKEN !== null) {
+      return new Response("Не авторизован", { status: 401 });
+    }
 
     let deleted = 0;
-    for await (const entry of kv.list()) {
+    for await (const entry of kv.list({ prefix: ["records"] })) {
       if (userName && userName === entry.value.name ||
-          dataTime && dataTime == entry.value.time) {
+          dataTime && dataTime == entry.value.time ||
+          maxLength && entry.value.name.length > maxLength) {
         await kv.delete(entry.key);
         deleted++;
       }
