@@ -42,6 +42,11 @@
   transform: scale(1.05);
 }
 
+#error-message {
+  color: red;
+  display: none;
+}
+
 .modal-overlay {
   position: fixed;
   top: 0;

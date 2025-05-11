@@ -49,6 +49,7 @@ serve(async (req) => {
 
     for await (const entry of kv.list({ prefix: ["records"] })) {
       if (userName && entry.value.name !== userName) continue;
+      if (entry.value.name.length > 64) continue;
       records.push(entry.value);
     }
 
@@ -74,6 +75,7 @@ serve(async (req) => {
 
   if (req.method === "DELETE" && url.pathname === "/api/records") {
     const userName = url.searchParams.get("userName");
+    const dataTime = url.searchParams.get("time");
     const auth = req.headers.get("Authorization");
 
     // if (auth !== SECRET_TOKEN && SECRET_TOKEN !== null) {
@@ -81,8 +83,9 @@ serve(async (req) => {
     // }
 
     let deleted = 0;
-    for await (const entry of kv.list({ prefix: ["records"] })) {
-      if (userName && userName === entry.value.name) {
+    for await (const entry of kv.list()) {
+      if (userName && userName === entry.value.name ||
+          dataTime && dataTime == entry.value.time) {
         await kv.delete(entry.key);
         deleted++;
       }

@@ -185,7 +185,8 @@
       <div class="modal-title">КОНЕЦ!</div>
       <div id="scores">Очков набрано: ${score}</div>
       <div id="levels">Уровней пройдено: ${level}</div>
-      <input type="text" class="modal-input" placeholder="Введите свой ник" id="player-name">
+      <input type="text" class="modal-input" placeholder="Введите свой ник" id="player-name" maxlength="64">
+      <div id="error-message">Слишком длинный ник, введите короче</div>
       <div>
         <button class="modal-button" id="submit-score">Сохранить</button>
         <button class="modal-button" id="skip-submit">Скип</button>
