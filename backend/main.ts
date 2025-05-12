@@ -24,7 +24,7 @@ serve(async (req) => {
       const record = entry.value;
       if (record.name === name && record.score === score && record.level === level) {
         return new Response("Дублирующие записи", {
-          status: 409,
+          status: 208,
           headers: {
             "Access-Control-Allow-Origin": "*",
             "Access-Control-Allow-Methods": "POST, OPTIONS",
@@ -46,7 +46,8 @@ serve(async (req) => {
 
   if (req.method === "GET" && url.pathname === "/api/records") {
     const userName = url.searchParams.get("userName");
-    const limit = Number(url.searchParams.get("limit") ?? 100);
+    let limit = Number(url.searchParams.get("limit") ?? 100);
+    if (limit < 0) limit = 0;
     const records: any[] = [];
 
     for await (const entry of kv.list({ prefix: ["records"] })) {
