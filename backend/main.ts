@@ -16,7 +16,7 @@ serve(async (req) => {
     const { name, score, level, time } = body;
     const auth = req.headers.get("Authorization");
 
-    if (auth !== SECRET_TOKEN || Math.abs(Date.now() - new Date(time).getTime()) > 60) {
+    if (auth !== SECRET_TOKEN) {  // || Math.abs(Date.now() - new Date(time).getTime()) > 60) {
       return new Response("Не авторизован", { status: 401 });
     }
 
