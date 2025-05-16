@@ -13,10 +13,10 @@ serve(async (req) => {
 
   if (req.method === "POST" && url.pathname === "/api/record") {
     const body = await req.json();
-    const { name, score, level } = body;
+    const { name, score, level, time } = body;
     const auth = req.headers.get("Authorization");
 
-    if (auth !== SECRET_TOKEN) {
+    if (auth !== SECRET_TOKEN || Math.abs(Date.now() - new Date(time).getTime()) > 60) {
       return new Response("Не авторизован", { status: 401 });
     }
 

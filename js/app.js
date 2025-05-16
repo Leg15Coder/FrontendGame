@@ -81,7 +81,7 @@ function movePlayer(dx, dy) {
 function moveEnemies() {
   const newUnits = [];
 
-  if (grid.units.length === 0) {
+  if (grid.units.length === 0 || timer > level * level * 16) {
     spawnEnemy(player, grid, level);
     renderGame(grid, player, score, level, false);
   }
@@ -233,6 +233,16 @@ window.showRecords = async function () {
   const res = await fetch(url);
   const records = await res.json();
 
+  function escapeHtml(unsafe) {
+    return unsafe
+      .toString()
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
   const table = `
     <table border="1" cellpadding="6" style="margin: auto; background: #222; color: white;" class="leaderboard">
       <tr>
@@ -241,10 +251,10 @@ window.showRecords = async function () {
       ${records.map((r, i) => `
         <tr>
           <td>${i + 1}</td>
-          <td>${r.name}</td>
-          <td>${r.score}</td>
-          <td>${r.level}</td>
-          <td>${new Date(r.time).toLocaleString()}</td>
+          <td>${escapeHtml(r.name)}</td>
+          <td>${escapeHtml(r.score.toString())}</td>
+          <td>${escapeHtml(r.level.toString())}</td>
+          <td>${escapeHtml(new Date(r.time).toLocaleString())}</td>
         </tr>
       `).join('')}
     </table>
