@@ -81,7 +81,7 @@ function movePlayer(dx, dy) {
 function moveEnemies() {
   const newUnits = [];
 
-  if (grid.units.length === 0 || (timer > level * level * 64 && timer % level === 0)) {
+  if (grid.units.length === 0 || (timer > level * level * 64 && timer % level === 0 && player.detectedRate > 100)) {
     spawnEnemy(player, grid, level);
     renderGame(grid, player, score, level, false);
   }
